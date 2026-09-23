@@ -421,6 +421,26 @@ function build(over = {}) {
   }
   ok('All recommended weapons/skills/feats resolve', badW.length === 0, badW.join(', '));
 
+  // Every spell must have a complete header. Regression: 12 spells use the
+  // singular "Component:" spelling and previously parsed as null, and wrapped
+  // casting times were truncated mid-hyphenation.
+  for (const f of ['castingTime', 'range', 'components', 'duration', 'description']) {
+    const bad = DATA.spells.spells.filter(s => !s[f]);
+    ok(`no spell has an empty ${f}`, bad.length === 0, bad.slice(0, 5).map(s => s.name).join(', '));
+  }
+  ok('no casting time was cut off mid-hyphenation',
+    DATA.spells.spells.filter(s => /-$/.test(s.castingTime)).length === 0);
+
+  // Curly quotes are normalized so ids, search and the text export stay clean.
+  const curly = DATA.spells.spells.filter(s =>
+    /[‘’“”]/.test([s.name, s.description, s.castingTime, s.range, s.components, s.duration].join(' ')));
+  ok('no curly punctuation survives in spell data', curly.length === 0, curly.slice(0, 5).map(s => s.name).join(', '));
+
+  // Regression: "Hunter's Mark" must slug to hunters-mark, not hunter-s-mark.
+  ok('apostrophes are stripped from spell ids, not turned into separators',
+    DATA.spells.spells.every(s => !/-s-/.test(s.id)),
+    DATA.spells.spells.filter(s => /-s-/.test(s.id)).map(s => s.id).join(', '));
+
   // Starting equipment armor names must match the armor table.
   const badArmor = [];
   for (const c of DATA.classes.classes) {

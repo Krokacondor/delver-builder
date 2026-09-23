@@ -65,10 +65,10 @@ export function renderSheet(root, char, ctx) {
   const stat = (k, v, x) => stats.appendChild(el('div', { class: 'statbox' },
     el('div', { class: 'k', text: k }), el('div', { class: 'v', text: v }), x ? el('div', { class: 'x', text: x }) : null));
   stat('Armor Class', String(d.ac), d.acHow);
-  stat('Hit Points', String(d.hp), `${d.hitDie} + ${fmt(d.mods.con)} CON`);
+  stat('Hit Points', String(d.hp), `${d.hitDie} ${fmt(d.mods.con)} CON`);
   stat('Initiative', fmt(d.initiative), d.initiative !== d.mods.dex ? 'includes Alert' : 'DEX');
   stat('Proficiency', fmt(d.pb), 'add when trained');
-  stat('Hit Dice', `1${d.hitDie}`, 'spend on a short rest');
+  stat('Hit Dice', d.hitDie, 'spend on a short rest');
   stat('Passive Perception', String(d.passivePerception), 'what you notice');
   sheet.appendChild(stats);
 
@@ -300,7 +300,7 @@ function sheetText(char, d) {
   L.push(`Level 1 ${d.sp.name} ${d.cls.name} · ${d.bg.name}`);
   L.push('');
   L.push(`AC ${d.ac} (${d.acHow})`);
-  L.push(`HP ${d.hp}  |  Hit Dice 1${d.hitDie}  |  Initiative ${fmt(d.initiative)}  |  Speed ${d.speed} ft  |  Proficiency ${fmt(d.pb)}`);
+  L.push(`HP ${d.hp}  |  Hit Dice ${d.hitDie}  |  Initiative ${fmt(d.initiative)}  |  Speed ${d.speed} ft  |  Proficiency ${fmt(d.pb)}`);
   L.push(`Size ${d.size}${d.darkvision ? `  |  Darkvision ${d.darkvision} ft` : ''}${d.resistances.length ? `  |  Resist ${d.resistances.join(', ')}` : ''}`);
   L.push('');
   L.push('ABILITY SCORES');

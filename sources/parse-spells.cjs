@@ -113,27 +113,39 @@ for (let s = 0; s < starts.length; s++) {
   const endIdx2 = next ? next.nameIdx : body.length;
   const block = body.slice(cur.headIdx, endIdx2);
 
+  // Field labels, in the order the SRD prints them. Note "Component:" singular:
+  // 12 spells use it instead of "Components:".
+  const LABEL_RE = /^(Casting Time|Range|Components?|Duration):/;
+
+  // Index every label line once, so a field's value can run to the next label.
+  const labelIdx = [];
+  for (let i = 0; i < block.length; i++) {
+    if (LABEL_RE.test(block[i].trim())) labelIdx.push(i);
+  }
+
   const field = label => {
-    const idx = block.findIndex(l => new RegExp('^' + label + ':').test(l.trim()));
+    const re = new RegExp('^' + label + ':');
+    const idx = block.findIndex(l => re.test(l.trim()));
     if (idx < 0) return null;
-    let val = block[idx].trim().replace(new RegExp('^' + label + ':\\s*'), '');
-    // value may wrap
-    let j = idx + 1;
-    while (j < block.length) {
-      const t = block[j].trim();
-      if (/^(Casting Time|Range|Components|Duration):/.test(t) || t === '') break;
-      if (/^[A-Z]/.test(t) && val.endsWith(')')) break;
-      if (!/^(V|S|M|\()/.test(t) && label !== 'Components') break;
-      val += ' ' + t;
-      j++;
-    }
+
+    // Duration is always the last header field and never wraps in this document,
+    // so stop at its own line; otherwise run to whatever label comes next.
+    const next = labelIdx.find(i => i > idx);
+    const stop = label === 'Duration'
+      ? idx + 1
+      : (next !== undefined ? next : idx + 1);
+
+    const parts = block.slice(idx, stop).map(l => l.trim()).filter(Boolean);
+    let val = parts.join('\n').replace(re, '').trim();
+    // Rejoin words the PDF split across lines with a hyphen.
+    val = val.replace(/([a-zA-Z])-\n([a-z])/g, '$1$2').replace(/\n/g, ' ');
     return val.replace(/\s+/g, ' ').trim();
   };
 
-  const castingTime = field('Casting Time');
-  const range = field('Range');
-  const components = field('Components');
-  const duration = field('Duration');
+  const castingTime = tidy(field('Casting Time'));
+  const range = tidy(field('Range'));
+  const components = tidy(field('Components?'));
+  const duration = tidy(field('Duration'));
 
   const durIdx = block.findIndex(l => /^Duration:/.test(l.trim()));
   let descLines = durIdx >= 0 ? block.slice(durIdx + 1) : [];
