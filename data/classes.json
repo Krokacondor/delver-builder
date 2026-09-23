@@ -1,0 +1,442 @@
+{
+  "note": "Class rules text from SRD 5.2.1 (CC-BY-4.0). 'plain', 'tagline', 'role' and 'difficulty' fields are original guidance for new players.",
+  "rules": {
+    "intro": "Your class is what your character does: fights, sneaks, heals, casts spells. It is the single biggest decision in character creation, so it goes first.",
+    "subclassNote": "In the 2024 rules every class picks its subclass at level 3, not level 1. So you do not need to worry about subclasses yet."
+  },
+  "classes": [
+    {
+      "id": "fighter",
+      "name": "Fighter",
+      "tagline": "The most straightforward way to be good at fighting.",
+      "plain": "You hit things, you are hard to hurt, and you have no spells to track. Fighters get the widest weapon and armor access in the game plus a self-heal. If this is your first character, start here.",
+      "role": "Damage / Frontline",
+      "difficulty": 1,
+      "beginnerPick": true,
+      "primaryAbility": ["str", "dex"],
+      "primaryAbilityNote": "Strength if you want heavy armor and big weapons, Dexterity if you want a bow or finesse weapons. Pick one, do not split.",
+      "abilityPriority": { "str": ["str", "con", "dex", "wis", "cha", "int"], "dex": ["dex", "con", "wis", "str", "cha", "int"] },
+      "hitDie": 10,
+      "savingThrows": ["str", "con"],
+      "skills": { "count": 2, "from": ["acrobatics", "animalhandling", "athletics", "history", "insight", "intimidation", "persuasion", "perception", "survival"] },
+      "weaponProficiencies": "Simple and Martial weapons",
+      "armorTraining": "Light, Medium, and Heavy armor and Shields",
+      "toolProficiencies": null,
+      "startingEquipment": [
+        { "id": "A", "label": "Heavy armor and big weapons", "items": ["Chain Mail", "Greatsword", "Flail", "8 Javelins", "Dungeoneer's Pack"], "gp": 4, "note": "Strength build. AC 16, and a greatsword hits for 2d6." },
+        { "id": "B", "label": "Light armor and a bow", "items": ["Studded Leather Armor", "Scimitar", "Shortsword", "Longbow", "20 Arrows", "Quiver", "Dungeoneer's Pack"], "gp": 11, "note": "Dexterity build. Shoot from range, two swords up close." },
+        { "id": "C", "label": "Just the gold", "items": [], "gp": 155, "note": "Buy your own gear. Not recommended for a first character." }
+      ],
+      "features": [
+        { "name": "Fighting Style", "text": "You have honed your martial prowess and gain a Fighting Style feat of your choice. Defense is recommended. Whenever you gain a Fighter level, you can replace the feat you chose with a different Fighting Style feat.", "plain": "Pick a combat specialty. Defense gives +1 AC and is never wrong. Archery gives +2 to hit with bows.", "choice": { "id": "fightingStyle", "label": "Choose a Fighting Style", "grant": { "type": "feat", "category": "fightingStyle", "count": 1 }, "recommended": "defense" } },
+        { "name": "Second Wind", "text": "You have a limited well of physical and mental stamina that you can draw on. As a Bonus Action, you can use it to regain Hit Points equal to 1d10 plus your Fighter level. You can use this feature twice. You regain one expended use when you finish a Short Rest, and you regain all expended uses when you finish a Long Rest.", "plain": "Twice per rest, heal yourself 1d10+1 as a bonus action. You can still attack on the same turn. This keeps first-level fighters alive." },
+        { "name": "Weapon Mastery", "text": "Your training with weapons allows you to use the mastery properties of three kinds of Simple or Martial weapons of your choice. Whenever you finish a Long Rest, you can practice weapon drills and change one of those weapon choices.", "plain": "Three weapons get a bonus effect on top of their damage, like knocking a target prone or shoving it back. Fighters get more of these than anyone.", "choice": { "id": "weaponMastery", "label": "Choose 3 weapons for Weapon Mastery", "grant": { "type": "weaponMastery", "count": 3, "from": "simple-or-martial" } } }
+      ],
+      "spellcasting": null
+    },
+    {
+      "id": "barbarian",
+      "name": "Barbarian",
+      "tagline": "Rage, take half damage from everything, keep swinging.",
+      "plain": "The toughest class in the game and one of the simplest. You Rage as a bonus action, then physical damage is halved against you and your hits do more. No spells, no bookkeeping, biggest hit die in the game.",
+      "role": "Damage / Frontline",
+      "difficulty": 1,
+      "beginnerPick": true,
+      "primaryAbility": ["str"],
+      "primaryAbilityNote": "Strength, always. Constitution second, because your armor comes from it.",
+      "abilityPriority": { "default": ["str", "con", "dex", "wis", "cha", "int"] },
+      "hitDie": 12,
+      "savingThrows": ["str", "con"],
+      "skills": { "count": 2, "from": ["animalhandling", "athletics", "intimidation", "nature", "perception", "survival"] },
+      "weaponProficiencies": "Simple and Martial weapons",
+      "armorTraining": "Light and Medium armor and Shields",
+      "toolProficiencies": null,
+      "startingEquipment": [
+        { "id": "A", "label": "Greataxe and handaxes", "items": ["Greataxe", "4 Handaxes", "Explorer's Pack"], "gp": 15, "note": "Take this one. The greataxe is your main weapon, the handaxes are for throwing." },
+        { "id": "B", "label": "Just the gold", "items": [], "gp": 75, "note": "Buy your own gear." }
+      ],
+      "features": [
+        { "name": "Rage", "text": "You can imbue yourself with a primal power called Rage, a force that grants you extraordinary might and resilience. You can enter it as a Bonus Action if you aren't wearing Heavy armor. While active: you have Resistance to Bludgeoning, Piercing, and Slashing damage; you gain a bonus to damage when you attack using Strength; you have Advantage on Strength checks and Strength saving throws; you cannot maintain Concentration or cast spells. The Rage lasts until the end of your next turn and can be extended by attacking, forcing a save, or spending a Bonus Action, up to 10 minutes.", "plain": "Bonus action to turn on. While raging: swords, arrows and clubs do HALF damage to you, and you add +2 damage to every Strength attack. Twice per long rest at level 1. Keep it going by attacking each turn.", "uses": { "count": 2, "per": "long rest, one back on a short rest" } },
+        { "name": "Unarmored Defense", "text": "While you aren't wearing any armor, your base Armor Class equals 10 plus your Dexterity and Constitution modifiers. You can use a Shield and still gain this benefit.", "plain": "Wear no armor at all. Your AC is 10 + DEX + CON, and you can still carry a shield. With 14 DEX and 16 CON that is AC 15, or 17 with a shield.", "acFormula": { "base": 10, "add": ["dex", "con"], "shieldAllowed": true } },
+        { "name": "Weapon Mastery", "text": "Your training with weapons allows you to use the mastery properties of two kinds of Simple or Martial Melee weapons of your choice, such as Greataxes and Handaxes. Whenever you finish a Long Rest, you can practice weapon drills and change one of those weapon choices.", "plain": "Two melee weapons get a bonus effect. Greataxe (Cleave) lets you hit a second enemy standing nearby.", "choice": { "id": "weaponMastery", "label": "Choose 2 melee weapons for Weapon Mastery", "grant": { "type": "weaponMastery", "count": 2, "from": "simple-or-martial-melee" }, "recommended": ["Greataxe", "Handaxe"] } }
+      ],
+      "spellcasting": null
+    },
+    {
+      "id": "rogue",
+      "name": "Rogue",
+      "tagline": "Sneak Attack, four skills, and the best lockpicking in the game.",
+      "plain": "You deal a big extra chunk of damage whenever you have advantage or a friend is next to your target, which is most of the time. Outside combat you are the one who finds the traps and opens the doors. No spells.",
+      "role": "Damage / Skills",
+      "difficulty": 2,
+      "beginnerPick": true,
+      "primaryAbility": ["dex"],
+      "primaryAbilityNote": "Dexterity does everything for you: attacks, damage, AC, stealth and initiative.",
+      "abilityPriority": { "default": ["dex", "con", "wis", "int", "cha", "str"] },
+      "hitDie": 8,
+      "savingThrows": ["dex", "int"],
+      "skills": { "count": 4, "from": ["acrobatics", "athletics", "deception", "insight", "intimidation", "investigation", "perception", "persuasion", "sleightofhand", "stealth"] },
+      "weaponProficiencies": "Simple weapons and Martial weapons that have the Finesse or Light property",
+      "armorTraining": "Light armor",
+      "toolProficiencies": "Thieves' Tools",
+      "startingEquipment": [
+        { "id": "A", "label": "Full burglar kit", "items": ["Leather Armor", "2 Daggers", "Shortsword", "Shortbow", "20 Arrows", "Quiver", "Thieves' Tools", "Burglar's Pack"], "gp": 8, "note": "Take this. It covers melee, ranged and lockpicking." },
+        { "id": "B", "label": "Just the gold", "items": [], "gp": 100, "note": "Buy your own gear." }
+      ],
+      "features": [
+        { "name": "Expertise", "text": "You gain Expertise in two of your skill proficiencies of your choice. Sleight of Hand and Stealth are recommended if you have proficiency in them.", "plain": "Two of your skills get DOUBLE your proficiency bonus, so +4 instead of +2 at level 1. Pick the two you plan to use constantly.", "choice": { "id": "expertise", "label": "Choose 2 skills for Expertise", "grant": { "type": "expertise", "count": 2, "from": "proficientSkills" }, "recommended": ["sleightofhand", "stealth"] } },
+        { "name": "Sneak Attack", "text": "Once per turn, you can deal an extra 1d6 damage to one creature you hit with an attack roll if you have Advantage on the roll and the attack uses a Finesse or a Ranged weapon. You don't need Advantage on the attack roll if at least one of your allies is within 5 feet of the target, the ally doesn't have the Incapacitated condition, and you don't have Disadvantage on the attack roll.", "plain": "Once per turn, add 1d6 damage if you have advantage OR if a friend is standing next to your target. In a normal party that is almost every turn. Must be a finesse or ranged weapon." },
+        { "name": "Thieves' Cant", "text": "You know Thieves' Cant and one other language of your choice.", "plain": "A secret code thieves use to pass messages. Plus one extra normal language.", "choice": { "id": "language", "label": "Choose one extra language", "grant": { "type": "language", "count": 1 } } },
+        { "name": "Weapon Mastery", "text": "Your training with weapons allows you to use the mastery properties of two kinds of weapons of your choice with which you have proficiency, such as Daggers and Shortbows.", "plain": "Two weapons get a bonus effect. Dagger (Nick) lets you make your off-hand attack for free.", "choice": { "id": "weaponMastery", "label": "Choose 2 weapons for Weapon Mastery", "grant": { "type": "weaponMastery", "count": 2, "from": "proficientWeapons" }, "recommended": ["Dagger", "Shortbow"] } }
+      ],
+      "spellcasting": null
+    },
+    {
+      "id": "cleric",
+      "name": "Cleric",
+      "tagline": "Heal your friends, wear real armor, and still fight.",
+      "plain": "The most flexible spellcaster for a beginner. You get more starting spells than anyone, you can wear armor and carry a shield, and you can change which spells you have prepared every single morning, so a bad pick is never permanent.",
+      "role": "Healer / Support",
+      "difficulty": 2,
+      "beginnerPick": true,
+      "primaryAbility": ["wis"],
+      "primaryAbilityNote": "Wisdom powers all your spells. Constitution keeps you standing.",
+      "abilityPriority": { "default": ["wis", "con", "str", "dex", "cha", "int"] },
+      "hitDie": 8,
+      "savingThrows": ["wis", "cha"],
+      "skills": { "count": 2, "from": ["history", "insight", "medicine", "persuasion", "religion"] },
+      "weaponProficiencies": "Simple weapons",
+      "armorTraining": "Light and Medium armor and Shields",
+      "toolProficiencies": null,
+      "startingEquipment": [
+        { "id": "A", "label": "Armor, shield and mace", "items": ["Chain Shirt", "Shield", "Mace", "Holy Symbol", "Priest's Pack"], "gp": 7, "note": "Take this. AC 15 with the shield is excellent for a caster." },
+        { "id": "B", "label": "Just the gold", "items": [], "gp": 110, "note": "Buy your own gear." }
+      ],
+      "features": [
+        { "name": "Divine Order", "text": "You have dedicated yourself to one of the following sacred roles of your choice.", "plain": "Pick whether you lean fighter or lean caster.", "choice": { "id": "divineOrder", "label": "Choose your Divine Order", "grant": { "type": "option", "count": 1 }, "options": [
+          { "id": "protector", "name": "Protector", "text": "Trained for battle, you gain proficiency with Martial weapons and training with Heavy armor.", "plain": "Martial weapons and heavy armor. Grab Chain Mail when you can afford it for AC 16, or 18 with a shield. Pick this if you want to stand in the front.", "effects": { "weaponProficiencies": ["Martial weapons"], "armorTraining": ["Heavy armor"] } },
+          { "id": "thaumaturge", "name": "Thaumaturge", "text": "You know one extra cantrip from the Cleric spell list. In addition, your mystical connection to the divine gives you a bonus to your Intelligence (Arcana or Religion) checks. The bonus equals your Wisdom modifier (minimum of +1).", "plain": "A fourth cantrip and a bonus to Arcana and Religion checks. Pick this if you want to stand in the back and cast.", "effects": { "bonusCantrips": 1 } }
+        ] } },
+        { "name": "Spellcasting", "text": "You have learned to cast spells through prayer and meditation. Wisdom is your spellcasting ability. You can use a Holy Symbol as a Spellcasting Focus. You know three cantrips from the Cleric spell list, and you prepare four level 1 spells. Whenever you finish a Long Rest, you can change your list of prepared spells.", "plain": "Three cantrips (four as a Thaumaturge) plus four prepared spells, cast using two spell slots. You swap your prepared list every morning, which makes clerics very forgiving." }
+      ],
+      "spellcasting": {
+        "list": "cleric",
+        "ability": "wis",
+        "focus": "Holy Symbol",
+        "cantripsKnown": 3,
+        "preparedSpells": 4,
+        "slots": { "1": 2 },
+        "prepareStyle": "prepared",
+        "changeWhen": "Long Rest",
+        "recommended": { "cantrips": ["guidance", "sacred-flame", "thaumaturgy"], "spells": ["bless", "cure-wounds", "guiding-bolt", "shield-of-faith"] }
+      }
+    },
+    {
+      "id": "paladin",
+      "name": "Paladin",
+      "tagline": "Heavy armor, a big sword, healing hands and a little magic.",
+      "plain": "A knight who can heal. You wear the heaviest armor, swing a real weapon, restore hit points by touch, and have just two spells to keep track of. A great bridge between fighting and casting.",
+      "role": "Frontline / Support",
+      "difficulty": 2,
+      "beginnerPick": true,
+      "primaryAbility": ["str", "cha"],
+      "primaryAbilityNote": "Strength to hit things, Charisma for your spells and later auras. You need both, which makes paladins ability-hungry.",
+      "abilityPriority": { "default": ["str", "cha", "con", "wis", "dex", "int"] },
+      "hitDie": 10,
+      "savingThrows": ["wis", "cha"],
+      "skills": { "count": 2, "from": ["athletics", "insight", "intimidation", "medicine", "persuasion", "religion"] },
+      "weaponProficiencies": "Simple and Martial weapons",
+      "armorTraining": "Light, Medium, and Heavy armor and Shields",
+      "toolProficiencies": null,
+      "startingEquipment": [
+        { "id": "A", "label": "Full plate-and-sword knight", "items": ["Chain Mail", "Shield", "Longsword", "6 Javelins", "Holy Symbol", "Priest's Pack"], "gp": 9, "note": "Take this. AC 18 at level 1 is the best in the game." },
+        { "id": "B", "label": "Just the gold", "items": [], "gp": 150, "note": "Buy your own gear." }
+      ],
+      "features": [
+        { "name": "Lay On Hands", "text": "Your blessed touch can heal wounds. You have a pool of healing power that replenishes when you finish a Long Rest. With that pool, you can restore a total number of Hit Points equal to five times your Paladin level. As a Bonus Action, you can touch a creature (which could be yourself) and draw power from the pool of healing to restore a number of Hit Points to that creature. You can also expend 5 Hit Points from the pool to remove the Poisoned condition.", "plain": "A pool of 5 hit points at level 1 that you spend as a bonus action to heal anyone you touch, including yourself. Refills every long rest. No spell slot needed.", "pool": { "perLevel": 5 } },
+        { "name": "Spellcasting", "text": "You have learned to cast spells through prayer and meditation. Charisma is your spellcasting ability. You can use a Holy Symbol as a Spellcasting Focus. To start, choose two level 1 Paladin spells. Whenever you finish a Long Rest, you can replace one spell on your list.", "plain": "Two prepared spells and two slots. No cantrips. Paladins are fighters who happen to have a little magic." }
+      ],
+      "spellcasting": {
+        "list": "paladin",
+        "ability": "cha",
+        "focus": "Holy Symbol",
+        "cantripsKnown": 0,
+        "preparedSpells": 2,
+        "slots": { "1": 2 },
+        "prepareStyle": "prepared",
+        "changeWhen": "Long Rest (one spell)",
+        "recommended": { "cantrips": [], "spells": ["heroism", "searing-smite"] }
+      },
+      "extraFeatures": [
+        { "name": "Weapon Mastery", "text": "Your training with weapons allows you to use the mastery properties of two kinds of weapons of your choice with which you have proficiency, such as Longswords and Javelins. Whenever you finish a Long Rest, you can change the kinds of weapons you chose.", "plain": "Two weapons get a bonus effect. Longsword (Sap) gives the target disadvantage on its next attack.", "choice": { "id": "weaponMastery", "label": "Choose 2 weapons for Weapon Mastery", "grant": { "type": "weaponMastery", "count": 2, "from": "proficientWeapons" }, "recommended": ["Longsword", "Javelin"] } }
+      ]
+    },
+    {
+      "id": "ranger",
+      "name": "Ranger",
+      "tagline": "Bow, wilderness skills, and a damage-boosting hunting mark.",
+      "plain": "A tracker and archer with a handful of nature spells. Hunter's Mark is free twice a day and adds damage to every hit, so your turn stays simple: mark a target, then shoot it.",
+      "role": "Damage / Explorer",
+      "difficulty": 2,
+      "beginnerPick": true,
+      "primaryAbility": ["dex", "wis"],
+      "primaryAbilityNote": "Dexterity for your bow, Wisdom for your spells. Dexterity first.",
+      "abilityPriority": { "default": ["dex", "wis", "con", "str", "cha", "int"] },
+      "hitDie": 10,
+      "savingThrows": ["str", "dex"],
+      "skills": { "count": 3, "from": ["animalhandling", "athletics", "insight", "investigation", "nature", "perception", "stealth", "survival"] },
+      "weaponProficiencies": "Simple and Martial weapons",
+      "armorTraining": "Light and Medium armor and Shields",
+      "toolProficiencies": null,
+      "startingEquipment": [
+        { "id": "A", "label": "Archer's kit", "items": ["Studded Leather Armor", "Scimitar", "Shortsword", "Longbow", "20 Arrows", "Quiver", "Druidic Focus (sprig of mistletoe)", "Explorer's Pack"], "gp": 7, "note": "Take this. The longbow is your main weapon." },
+        { "id": "B", "label": "Just the gold", "items": [], "gp": 150, "note": "Buy your own gear." }
+      ],
+      "features": [
+        { "name": "Favored Enemy", "text": "You always have the Hunter's Mark spell prepared. You can cast it twice without expending a spell slot, and you regain all expended uses of this ability when you finish a Long Rest.", "plain": "Hunter's Mark is always ready and free twice a day. Cast it on a target and every hit does an extra 1d6. This does not count against your two prepared spells.", "alwaysPrepared": ["hunters-mark"] },
+        { "name": "Spellcasting", "text": "You have learned to channel the magical essence of nature to cast spells. Wisdom is your spellcasting ability. You can use a Druidic Focus as a Spellcasting Focus. To start, choose two level 1 Ranger spells. Whenever you finish a Long Rest, you can replace one spell on your list.", "plain": "Two prepared spells and two slots, on top of your free Hunter's Mark. No cantrips." },
+        { "name": "Weapon Mastery", "text": "Your training with weapons allows you to use the mastery properties of two kinds of weapons of your choice with which you have proficiency, such as Longbows and Shortswords. Whenever you finish a Long Rest, you can change the kinds of weapons you chose.", "plain": "Two weapons get a bonus effect. Longbow (Slow) drops the target's speed by 10 feet so it cannot close on you.", "choice": { "id": "weaponMastery", "label": "Choose 2 weapons for Weapon Mastery", "grant": { "type": "weaponMastery", "count": 2, "from": "proficientWeapons" }, "recommended": ["Longbow", "Shortsword"] } }
+      ],
+      "spellcasting": {
+        "list": "ranger",
+        "ability": "wis",
+        "focus": "Druidic Focus",
+        "cantripsKnown": 0,
+        "preparedSpells": 2,
+        "slots": { "1": 2 },
+        "prepareStyle": "prepared",
+        "changeWhen": "Long Rest (one spell)",
+        "alwaysPrepared": ["hunters-mark"],
+        "recommended": { "cantrips": [], "spells": ["cure-wounds", "ensnaring-strike"] }
+      }
+    },
+    {
+      "id": "warlock",
+      "name": "Warlock",
+      "tagline": "A pact with something powerful. Few spells, and they come back fast.",
+      "plain": "You made a deal. You only get one spell slot, but it refills on a short rest instead of a long one, and Eldritch Blast means your at-will attack is genuinely strong all game. Fewer moving parts than a wizard.",
+      "role": "Damage / Caster",
+      "difficulty": 3,
+      "beginnerPick": false,
+      "primaryAbility": ["cha"],
+      "primaryAbilityNote": "Charisma for everything. Constitution second.",
+      "abilityPriority": { "default": ["cha", "con", "dex", "wis", "int", "str"] },
+      "hitDie": 8,
+      "savingThrows": ["wis", "cha"],
+      "skills": { "count": 2, "from": ["arcana", "deception", "history", "intimidation", "investigation", "nature", "religion"] },
+      "weaponProficiencies": "Simple weapons",
+      "armorTraining": "Light armor",
+      "toolProficiencies": null,
+      "startingEquipment": [
+        { "id": "A", "label": "Occultist's kit", "items": ["Leather Armor", "Sickle", "2 Daggers", "Arcane Focus (orb)", "Book (occult lore)", "Scholar's Pack"], "gp": 15, "note": "Take this." },
+        { "id": "B", "label": "Just the gold", "items": [], "gp": 100, "note": "Buy your own gear." }
+      ],
+      "features": [
+        { "name": "Eldritch Invocations", "text": "You have unearthed Eldritch Invocations, pieces of forbidden knowledge that imbue you with an abiding magical ability or other lessons. You gain one invocation of your choice.", "plain": "Pick one permanent magical perk. At level 1 only five are available to you.", "choice": { "id": "invocation", "label": "Choose 1 Eldritch Invocation", "grant": { "type": "option", "count": 1 }, "options": [
+          { "id": "armor-of-shadows", "name": "Armor of Shadows", "text": "You can cast Mage Armor on yourself without expending a spell slot.", "plain": "Permanent AC 13 + your Dexterity modifier, for free, forever. The safest pick for a squishy level 1 warlock." },
+          { "id": "eldritch-mind", "name": "Eldritch Mind", "text": "You have Advantage on Constitution saving throws that you make to maintain Concentration.", "plain": "Helps you keep concentration spells running when you get hit." },
+          { "id": "pact-of-the-blade", "name": "Pact of the Blade", "text": "As a Bonus Action, you can conjure a pact weapon in your hand, a Simple or Martial Melee weapon of your choice with which you bond. You have proficiency with the weapon and can use it as a Spellcasting Focus. Whenever you attack with the bonded weapon, you can use your Charisma modifier for the attack and damage rolls instead of Strength or Dexterity.", "plain": "Summon any melee weapon and attack with Charisma instead of Strength. This is how you play a sword-swinging warlock." },
+          { "id": "pact-of-the-chain", "name": "Pact of the Chain", "text": "You learn the Find Familiar spell and can cast it as a Magic action without expending a spell slot. You can choose special forms including Imp, Pseudodragon, Quasit, Skeleton, Sphinx of Wonder, Sprite, or Venomous Snake.", "plain": "A free magical pet with better options than normal. Fun, and a great scout." },
+          { "id": "pact-of-the-tome", "name": "Pact of the Tome", "text": "You conjure forth a book in your hand at the end of a Short or Long Rest. Choose three cantrips and two level 1 spells that have the Ritual tag. The spells can be from any class's spell list. While the book is on your person, you have the chosen spells prepared, and they function as Warlock spells for you.", "plain": "Three extra cantrips and two ritual spells from ANY class list. The biggest raw power boost of the five, but the most to keep track of." }
+        ] } },
+        { "name": "Pact Magic", "text": "Through occult ceremony, you have formed a pact with a mysterious entity to gain magical powers. Charisma is the spellcasting ability for your Warlock spells. You can use an Arcane Focus as a Spellcasting Focus. You know two Warlock cantrips and prepare two level 1 spells. You regain all expended Pact Magic spell slots when you finish a Short or Long Rest.", "plain": "Two cantrips and two prepared spells, but only ONE spell slot. The trade is that it comes back on a short rest, so across a day you cast more than you would expect." }
+      ],
+      "spellcasting": {
+        "list": "warlock",
+        "ability": "cha",
+        "focus": "Arcane Focus",
+        "cantripsKnown": 2,
+        "preparedSpells": 2,
+        "slots": { "1": 1 },
+        "slotRecharge": "Short or Long Rest",
+        "prepareStyle": "pact",
+        "changeWhen": "level up",
+        "recommended": { "cantrips": ["eldritch-blast", "prestidigitation"], "spells": ["charm-person", "hex"] }
+      }
+    },
+    {
+      "id": "bard",
+      "name": "Bard",
+      "tagline": "Any three skills, spells from a broad list, and you buff your friends.",
+      "plain": "The party's face and utility caster. You pick ANY three skills, which no other class can do, and Bardic Inspiration lets you hand a friend a d6 to save a failed roll. Charisma-based, so you talk your way out of things too.",
+      "role": "Support / Skills",
+      "difficulty": 3,
+      "beginnerPick": false,
+      "primaryAbility": ["cha"],
+      "primaryAbilityNote": "Charisma for spells and social skills. Dexterity second for AC.",
+      "abilityPriority": { "default": ["cha", "dex", "con", "wis", "int", "str"] },
+      "hitDie": 8,
+      "savingThrows": ["dex", "cha"],
+      "skills": { "count": 3, "from": "any" },
+      "weaponProficiencies": "Simple weapons",
+      "armorTraining": "Light armor",
+      "toolProficiencies": { "count": 3, "from": "musicalInstrument", "label": "Choose 3 Musical Instruments" },
+      "startingEquipment": [
+        { "id": "A", "label": "Performer's kit", "items": ["Leather Armor", "2 Daggers", "Musical Instrument of your choice", "Entertainer's Pack"], "gp": 19, "note": "Take this. The instrument doubles as your spellcasting focus." },
+        { "id": "B", "label": "Just the gold", "items": [], "gp": 90, "note": "Buy your own gear." }
+      ],
+      "features": [
+        { "name": "Bardic Inspiration", "text": "You can supernaturally inspire others through words, music, or dance. As a Bonus Action, you can inspire another creature within 60 feet of yourself who can see or hear you. That creature gains one of your Bardic Inspiration dice (a d6). Once within the next hour when the creature fails a D20 Test, the creature can roll the die and add the number rolled to the d20, potentially turning the failure into a success. You can confer a Bardic Inspiration die a number of times equal to your Charisma modifier (minimum of once), and you regain all expended uses when you finish a Long Rest.", "plain": "Bonus action: give a friend a d6. Any time in the next hour they miss an attack or fail a save, they add it and might turn the failure into a success. You get as many of these per day as your Charisma modifier.", "die": "d6", "uses": "Charisma modifier per Long Rest" },
+        { "name": "Spellcasting", "text": "You have learned to cast spells through your bardic arts. Charisma is your spellcasting ability. You can use a Musical Instrument as a Spellcasting Focus. You know two cantrips from the Bard spell list, and you prepare four level 1 spells.", "plain": "Two cantrips plus four prepared spells and two slots. Bards get more starting spells than most and their list leans toward tricks and control rather than raw damage." }
+      ],
+      "spellcasting": {
+        "list": "bard",
+        "ability": "cha",
+        "focus": "Musical Instrument",
+        "cantripsKnown": 2,
+        "preparedSpells": 4,
+        "slots": { "1": 2 },
+        "prepareStyle": "prepared",
+        "changeWhen": "level up",
+        "recommended": { "cantrips": ["dancing-lights", "vicious-mockery"], "spells": ["charm-person", "color-spray", "dissonant-whispers", "healing-word"] }
+      }
+    },
+    {
+      "id": "sorcerer",
+      "name": "Sorcerer",
+      "tagline": "Born with magic. Four cantrips, so you always have something to do.",
+      "plain": "Magic is in your blood rather than in a book. You start with four cantrips, more than any other class, which means you never run dry. Only two prepared spells though, so your big moments are limited at level 1.",
+      "role": "Damage / Caster",
+      "difficulty": 3,
+      "beginnerPick": false,
+      "primaryAbility": ["cha"],
+      "primaryAbilityNote": "Charisma for spells. Constitution second, because a d6 hit die is fragile.",
+      "abilityPriority": { "default": ["cha", "con", "dex", "wis", "int", "str"] },
+      "hitDie": 6,
+      "savingThrows": ["con", "cha"],
+      "skills": { "count": 2, "from": ["arcana", "deception", "insight", "intimidation", "persuasion", "religion"] },
+      "weaponProficiencies": "Simple weapons",
+      "armorTraining": "None",
+      "toolProficiencies": null,
+      "startingEquipment": [
+        { "id": "A", "label": "Spellcaster's kit", "items": ["Spear", "2 Daggers", "Arcane Focus (crystal)", "Dungeoneer's Pack"], "gp": 28, "note": "Take this. You have no armor, so stay at the back." },
+        { "id": "B", "label": "Just the gold", "items": [], "gp": 50, "note": "Buy your own gear." }
+      ],
+      "features": [
+        { "name": "Spellcasting", "text": "Drawing from your innate magic, you can cast spells. Charisma is your spellcasting ability. You can use an Arcane Focus as a Spellcasting Focus. You know four Sorcerer cantrips and prepare two level 1 spells.", "plain": "Four cantrips is the most of any class. Sorcerous Burst is your reliable damage cantrip, and it grows with you." },
+        { "name": "Innate Sorcery", "text": "An event in your past left an indelible mark on you, infusing you with simmering magic. As a Bonus Action, you can unleash that magic for 1 minute, during which the spell save DC of your Sorcerer spells increases by 1 and you have Advantage on the attack rolls of Sorcerer spells you cast. You can use this feature twice, and you regain all expended uses of it when you finish a Long Rest.", "plain": "Bonus action, twice per day: for one minute your spells are harder to resist and your spell attacks roll twice and take the better. Turn this on at the start of any serious fight." }
+      ],
+      "spellcasting": {
+        "list": "sorcerer",
+        "ability": "cha",
+        "focus": "Arcane Focus",
+        "cantripsKnown": 4,
+        "preparedSpells": 2,
+        "slots": { "1": 2 },
+        "prepareStyle": "prepared",
+        "changeWhen": "level up",
+        "recommended": { "cantrips": ["light", "prestidigitation", "shocking-grasp", "sorcerous-burst"], "spells": ["burning-hands", "detect-magic"] }
+      }
+    },
+    {
+      "id": "druid",
+      "name": "Druid",
+      "tagline": "Nature magic, talks to animals, turns into a bear at level 2.",
+      "plain": "A nature caster with a broad, flexible spell list and a free Speak with Animals. You can swap your prepared spells every morning like a cleric. Wild Shape arrives at level 2, so it is close but not here yet.",
+      "role": "Caster / Support",
+      "difficulty": 3,
+      "beginnerPick": false,
+      "primaryAbility": ["wis"],
+      "primaryAbilityNote": "Wisdom for spells, Constitution to survive.",
+      "abilityPriority": { "default": ["wis", "con", "dex", "int", "cha", "str"] },
+      "hitDie": 8,
+      "savingThrows": ["int", "wis"],
+      "skills": { "count": 2, "from": ["animalhandling", "arcana", "insight", "medicine", "nature", "perception", "religion", "survival"] },
+      "weaponProficiencies": "Simple weapons",
+      "armorTraining": "Light armor and Shields",
+      "toolProficiencies": "Herbalism Kit",
+      "equipmentNote": "Druids traditionally will not wear armor or use shields made of metal. Check with your DM; in the 2024 rules this is a roleplay choice, not a rule.",
+      "startingEquipment": [
+        { "id": "A", "label": "Nature kit", "items": ["Leather Armor", "Shield", "Sickle", "Druidic Focus (Quarterstaff)", "Explorer's Pack", "Herbalism Kit"], "gp": 9, "note": "Take this. The shield gives you AC 14, which is respectable." },
+        { "id": "B", "label": "Just the gold", "items": [], "gp": 50, "note": "Buy your own gear." }
+      ],
+      "features": [
+        { "name": "Druidic", "text": "You know Druidic, the secret language of Druids. While learning this ancient tongue, you also unlocked the magic of communicating with animals; you always have the Speak with Animals spell prepared. You can use Druidic to leave hidden messages. You and others who know Druidic automatically spot such a message. Others spot the message's presence with a successful DC 15 Intelligence (Investigation) check but can't decipher it without magic.", "plain": "A secret druid language, plus Speak with Animals is permanently prepared for free. It does not count against your four prepared spells.", "alwaysPrepared": ["speak-with-animals"] },
+        { "name": "Primal Order", "text": "You have dedicated yourself to one of the following sacred roles of your choice.", "plain": "Pick whether you lean caster or lean fighter.", "choice": { "id": "primalOrder", "label": "Choose your Primal Order", "grant": { "type": "option", "count": 1 }, "options": [
+          { "id": "magician", "name": "Magician", "text": "You know one extra cantrip from the Druid spell list. In addition, your mystical connection to nature gives you a bonus to your Intelligence (Arcana or Nature) checks. The bonus equals your Wisdom modifier (minimum bonus of +1).", "plain": "A third cantrip and a bonus to Arcana and Nature checks. The default pick.", "effects": { "bonusCantrips": 1 } },
+          { "id": "warden", "name": "Warden", "text": "Trained for battle, you gain proficiency with Martial weapons and training with Medium armor.", "plain": "Martial weapons and medium armor. Useful if you plan to melee, and it pairs well with Wild Shape at level 2.", "effects": { "weaponProficiencies": ["Martial weapons"], "armorTraining": ["Medium armor"] } }
+        ] } },
+        { "name": "Spellcasting", "text": "You have learned to cast spells through studying the mystical forces of nature. Wisdom is your spellcasting ability. You can use a Druidic Focus as a Spellcasting Focus. You know two cantrips from the Druid spell list, and you prepare four level 1 spells. Whenever you finish a Long Rest, you can change your list of prepared spells.", "plain": "Two cantrips (three as a Magician) plus four prepared spells and two slots. Like a cleric, you re-choose your prepared list every morning." }
+      ],
+      "spellcasting": {
+        "list": "druid",
+        "ability": "wis",
+        "focus": "Druidic Focus",
+        "cantripsKnown": 2,
+        "preparedSpells": 4,
+        "slots": { "1": 2 },
+        "prepareStyle": "prepared",
+        "changeWhen": "Long Rest",
+        "alwaysPrepared": ["speak-with-animals"],
+        "recommended": { "cantrips": ["druidcraft", "produce-flame"], "spells": ["animal-friendship", "cure-wounds", "faerie-fire", "thunderwave"] }
+      }
+    },
+    {
+      "id": "wizard",
+      "name": "Wizard",
+      "tagline": "The biggest spell list in the game, written in a book you own.",
+      "plain": "You start with six spells written in your spellbook and prepare four of them each morning. The most spell variety of any class, and the most bookkeeping. Very fragile at level 1, so stay behind someone.",
+      "role": "Caster / Control",
+      "difficulty": 4,
+      "beginnerPick": false,
+      "primaryAbility": ["int"],
+      "primaryAbilityNote": "Intelligence for spells. Constitution second, because a d6 hit die and no armor is dangerous.",
+      "abilityPriority": { "default": ["int", "con", "dex", "wis", "cha", "str"] },
+      "hitDie": 6,
+      "savingThrows": ["int", "wis"],
+      "skills": { "count": 2, "from": ["arcana", "history", "insight", "investigation", "medicine", "nature", "religion"] },
+      "weaponProficiencies": "Simple weapons",
+      "armorTraining": "None",
+      "toolProficiencies": null,
+      "startingEquipment": [
+        { "id": "A", "label": "Scholar's kit", "items": ["2 Daggers", "Arcane Focus (Quarterstaff)", "Robe", "Spellbook", "Scholar's Pack"], "gp": 5, "note": "Take this. You need the spellbook." },
+        { "id": "B", "label": "Just the gold", "items": [], "gp": 55, "note": "Buy your own gear. You still get your spellbook." }
+      ],
+      "features": [
+        { "name": "Spellcasting", "text": "As a student of arcane magic, you have learned to cast spells. Intelligence is your spellcasting ability. You can use an Arcane Focus or your spellbook as a Spellcasting Focus. You know three Wizard cantrips. Your spellbook starts with six level 1 Wizard spells of your choice, and you prepare four of them.", "plain": "Three cantrips, then SIX spells written in your book, of which you prepare four each morning. The other two are still yours, just not loaded today." },
+        { "name": "Ritual Adept", "text": "You can cast any spell as a Ritual if that spell has the Ritual tag and the spell is in your spellbook. You needn't have the spell prepared, but you must read from the book to cast a spell in this way.", "plain": "Any ritual spell in your book can be cast for free by taking 10 extra minutes, even if it is not prepared. This makes rituals like Detect Magic effectively unlimited." },
+        { "name": "Arcane Recovery", "text": "You can regain some of your magical energy by studying your spellbook. When you finish a Short Rest, you can choose expended spell slots to recover. The spell slots can have a combined level equal to no more than half your Wizard level (round up). Once you use this feature, you can't do so again until you finish a Long Rest.", "plain": "Once per day, get one spell slot back on a short rest. Effectively a third casting." }
+      ],
+      "spellcasting": {
+        "list": "wizard",
+        "ability": "int",
+        "focus": "Arcane Focus or your spellbook",
+        "cantripsKnown": 3,
+        "spellbookSpells": 6,
+        "preparedSpells": 4,
+        "preparedFrom": "spellbook",
+        "slots": { "1": 2 },
+        "prepareStyle": "spellbook",
+        "changeWhen": "Long Rest",
+        "recommended": { "cantrips": ["light", "mage-hand", "ray-of-frost"], "spellbook": ["detect-magic", "feather-fall", "mage-armor", "magic-missile", "sleep", "thunderwave"] }
+      }
+    },
+    {
+      "id": "monk",
+      "name": "Monk",
+      "tagline": "Fast, unarmored, punches twice a turn. No spells, lots of moving parts.",
+      "plain": "A martial artist who fights with fists and light weapons and gets a free extra attack every turn. No spells, but plenty to track, and you need good Dexterity AND good Wisdom, which is hard at level 1.",
+      "role": "Damage / Mobile",
+      "difficulty": 4,
+      "beginnerPick": false,
+      "primaryAbility": ["dex", "wis"],
+      "primaryAbilityNote": "You need both Dexterity and Wisdom high, because your AC is 10 + DEX + WIS. That is a lot to ask of one stat array.",
+      "abilityPriority": { "default": ["dex", "wis", "con", "str", "cha", "int"] },
+      "hitDie": 8,
+      "savingThrows": ["str", "dex"],
+      "skills": { "count": 2, "from": ["acrobatics", "athletics", "history", "insight", "religion", "stealth"] },
+      "weaponProficiencies": "Simple weapons and Martial weapons that have the Light property",
+      "armorTraining": "None",
+      "toolProficiencies": { "count": 1, "from": "artisanOrInstrument", "label": "Choose one type of Artisan's Tools or Musical Instrument" },
+      "startingEquipment": [
+        { "id": "A", "label": "Martial artist's kit", "items": ["Spear", "5 Daggers", "Artisan's Tools or Musical Instrument chosen above", "Explorer's Pack"], "gp": 11, "note": "Take this. Honestly you will mostly punch." },
+        { "id": "B", "label": "Just the gold", "items": [], "gp": 50, "note": "Buy your own gear." }
+      ],
+      "features": [
+        { "name": "Martial Arts", "text": "Your practice of martial arts gives you mastery of combat styles that use your Unarmed Strike and Monk weapons (Simple Melee weapons and Martial Melee weapons that have the Light property). You gain the following benefits while you are unarmed or wielding only Monk weapons and you aren't wearing armor or wielding a Shield. Bonus Unarmed Strike: you can make an Unarmed Strike as a Bonus Action. Martial Arts Die: you can roll 1d6 in place of the normal damage of your Unarmed Strike or Monk weapons. Dexterous Attacks: you can use your Dexterity modifier instead of your Strength modifier for the attack and damage rolls of your Unarmed Strikes and Monk weapons.", "plain": "Attack with your fists or a light weapon using Dexterity, do 1d6 instead of 1, and get a free extra punch as a bonus action every turn. Two attacks at level 1, which nobody else gets.", "martialArtsDie": "d6" },
+        { "name": "Unarmored Defense", "text": "While you aren't wearing armor or wielding a Shield, your base Armor Class equals 10 plus your Dexterity and Wisdom modifiers.", "plain": "No armor, no shield. AC is 10 + DEX + WIS. With 16 DEX and 14 WIS that is AC 17, but getting both that high at level 1 is expensive.", "acFormula": { "base": 10, "add": ["dex", "wis"], "shieldAllowed": false } }
+      ],
+      "spellcasting": null
+    }
+  ]
+}

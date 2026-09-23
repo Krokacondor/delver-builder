@@ -1,0 +1,106 @@
+{
+  "_README": [
+    "Copy this file to data/extras.json to add content that is not in the SRD.",
+    "data/extras.json is gitignored, so anything you put there stays on your machine",
+    "and is never published to GitHub Pages. The app loads it automatically if present.",
+    "",
+    "Use this for the 2024 Player's Handbook material the SRD leaves out:",
+    "  - Aasimar",
+    "  - the 12 backgrounds beyond Acolyte, Criminal, Sage and Soldier",
+    "  - Origin feats beyond Alert, Magic Initiate, Savage Attacker and Skilled",
+    "",
+    "Anything with an id that already exists REPLACES the core entry.",
+    "Anything with a new id is ADDED.",
+    "",
+    "The entries below are fake placeholders showing the required shape.",
+    "Delete them and fill in the real values from your own copy of the book."
+  ],
+
+  "species": [
+    {
+      "id": "example-species",
+      "name": "Example Species",
+      "tagline": "One short line that sells the species.",
+      "plain": "Two or three sentences in plain language for a new player.",
+      "beginnerFriendly": true,
+      "complexity": "simple",
+      "creatureType": "Humanoid",
+      "size": { "fixed": "Medium", "note": "about 5-6 feet tall" },
+      "speed": 30,
+      "traits": [
+        { "name": "Example Trait", "text": "The rules text for the trait.", "plain": "What it means in practice." }
+      ],
+      "choices": [
+        {
+          "id": "exampleChoice",
+          "label": "Pick one thing",
+          "help": "Guidance shown under the heading.",
+          "grant": { "type": "option", "count": 1 },
+          "options": [
+            {
+              "id": "option-a",
+              "name": "Option A",
+              "text": "Rules text.",
+              "plain": "Plain-language version.",
+              "effects": { "resistances": ["Radiant"], "cantrips": ["light"] },
+              "later": { "3": "Spell at level 3", "5": "Spell at level 5" }
+            }
+          ]
+        }
+      ],
+      "effects": { "darkvision": 60, "resistances": [], "cantrips": [], "hpPerLevel": 0 }
+    }
+  ],
+
+  "backgrounds": [
+    {
+      "id": "example-background",
+      "name": "Example Background",
+      "tagline": "One line of flavor.",
+      "plain": "Two sentences for a new player.",
+      "abilities": ["dex", "int", "cha"],
+      "feat": "alert",
+      "skills": ["acrobatics", "deception"],
+      "tools": [{ "fixed": "Thieves' Tools" }],
+      "equipment": {
+        "a": { "items": ["Some Item", "Another Item", "Traveler's Clothes"], "gp": 12 },
+        "b": { "items": [], "gp": 50 }
+      },
+      "goodFor": ["rogue", "bard"],
+      "beginnerFriendly": true
+    }
+  ],
+
+  "feats": [
+    {
+      "id": "example-feat",
+      "name": "Example Feat",
+      "category": "origin",
+      "plain": "What this feat does, in plain language.",
+      "benefits": [
+        { "name": "Benefit Name", "text": "The rules text for the benefit." }
+      ],
+      "choices": [],
+      "fromBackgrounds": []
+    }
+  ],
+
+  "spells": [
+    {
+      "id": "example-spell",
+      "name": "Example Spell",
+      "level": 1,
+      "school": "Evocation",
+      "classes": ["Wizard", "Sorcerer"],
+      "castingTime": "Action",
+      "range": "60 feet",
+      "components": "V, S",
+      "duration": "Instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "material": false,
+      "description": "What the spell does.",
+      "higherLevel": "What changes with a higher slot, or null."
+    }
+  ]
+}

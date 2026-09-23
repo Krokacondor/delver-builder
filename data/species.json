@@ -1,0 +1,253 @@
+{
+  "note": "Species rules text from SRD 5.2.1 (CC-BY-4.0). 'plain' fields are original plain-language rewrites for new players.",
+  "rules": {
+    "intro": "Your species is the kind of person your character is: dwarf, elf, orc and so on. In the 2024 rules your species does NOT change your ability scores. Those come from your background instead. Species gives you traits: darkvision, resistances, a bit of free magic, or a once-per-rest trick.",
+    "noAsiNote": "Coming from older D&D? This is the big change. Picking Dwarf no longer gives +2 Constitution. Any species works with any class, so pick the one you think is coolest."
+  },
+  "species": [
+    {
+      "id": "human",
+      "name": "Human",
+      "tagline": "Flexible and rewarding. The safest first pick.",
+      "plain": "Humans get no flashy magic, but they get to choose more than anyone else: a free skill and a free Origin feat. That makes them good at any class, and it lets you patch whatever your character is missing.",
+      "beginnerFriendly": true,
+      "complexity": "simple",
+      "creatureType": "Humanoid",
+      "size": { "choice": ["Medium", "Small"], "note": "Medium is about 4-7 feet tall; Small is about 2-4 feet tall." },
+      "speed": 30,
+      "traits": [
+        { "name": "Resourceful", "text": "You gain Heroic Inspiration whenever you finish a Long Rest.", "plain": "Every morning you wake up with one free reroll in your pocket. If you hate a d20 result, spend it and roll again." },
+        { "name": "Skillful", "text": "You gain proficiency in one skill of your choice.", "plain": "One extra skill, any skill you like." },
+        { "name": "Versatile", "text": "You gain an Origin feat of your choice. Skilled is recommended.", "plain": "A free Origin feat on top of the one your background gives you. Two feats at level 1 is a lot of character." }
+      ],
+      "choices": [
+        { "id": "skillful", "label": "Skillful: pick one skill", "help": "Any skill on the list. Pick something your class did not already give you.", "grant": { "type": "skill", "from": "any", "count": 1 } },
+        { "id": "versatile", "label": "Versatile: pick an Origin feat", "help": "Origin feats are the small starting feats. Skilled gives three more skills, Magic Initiate gives you spells, Tough gives extra hit points.", "grant": { "type": "originFeat", "count": 1 } }
+      ],
+      "effects": {}
+    },
+    {
+      "id": "dwarf",
+      "name": "Dwarf",
+      "tagline": "Tough, sees in the dark, hard to poison.",
+      "plain": "Dwarves are the durable pick. You see twice as far in the dark as most species, poison barely bothers you, and you quietly gain an extra hit point every single level.",
+      "beginnerFriendly": true,
+      "complexity": "simple",
+      "creatureType": "Humanoid",
+      "size": { "fixed": "Medium", "note": "about 4-5 feet tall" },
+      "speed": 30,
+      "traits": [
+        { "name": "Darkvision", "text": "You have Darkvision with a range of 120 feet.", "plain": "In darkness you see 120 feet as if it were dim light. That is double the usual range." },
+        { "name": "Dwarven Resilience", "text": "You have Resistance to Poison damage. You also have Advantage on saving throws you make to avoid or end the Poisoned condition.", "plain": "Poison damage is halved against you, and you roll twice and take the better result to shrug off being Poisoned." },
+        { "name": "Dwarven Toughness", "text": "Your Hit Point maximum increases by 1, and it increases by 1 again whenever you gain a level.", "plain": "One extra hit point now, and one more at every level. Small, but it never stops." },
+        { "name": "Stonecunning", "text": "As a Bonus Action, you gain Tremorsense with a range of 60 feet for 10 minutes. You must be on a stone surface or touching a stone surface to use this Tremorsense. The stone can be natural or worked. You can use this Bonus Action a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.", "plain": "While touching stone, you feel vibrations through it and sense everything moving within 60 feet, even invisible things. Usable twice per long rest at level 1." }
+      ],
+      "choices": [],
+      "effects": { "darkvision": 120, "resistances": ["Poison"], "hpPerLevel": 1 }
+    },
+    {
+      "id": "elf",
+      "name": "Elf",
+      "tagline": "Free spells, keen senses, three flavors to choose from.",
+      "plain": "Elves pick a lineage that decides what free magic they get. All elves resist being charmed, get a bonus skill, and only need four hours of rest instead of eight.",
+      "beginnerFriendly": true,
+      "complexity": "medium",
+      "creatureType": "Humanoid",
+      "size": { "fixed": "Medium", "note": "about 5-6 feet tall" },
+      "speed": 30,
+      "traits": [
+        { "name": "Darkvision", "text": "You have Darkvision with a range of 60 feet.", "plain": "You can see in darkness out to 60 feet as if it were dim light." },
+        { "name": "Elven Lineage", "text": "You are part of a lineage that grants you supernatural abilities. Choose a lineage from the Elven Lineages table. You gain the level 1 benefit of the chosen lineage. When you reach character levels 3 and 5, you learn a higher-level spell, as shown on the table.", "plain": "Pick Drow, High Elf or Wood Elf. Each gives you a free cantrip now and more spells at levels 3 and 5." },
+        { "name": "Fey Ancestry", "text": "You have Advantage on saving throws you make to avoid or end the Charmed condition.", "plain": "Roll twice and take the better result whenever something tries to charm you." },
+        { "name": "Keen Senses", "text": "You have proficiency in the Insight, Perception, or Survival skill.", "plain": "One free skill from a short list. Perception is the most-used skill in the game if you are unsure." },
+        { "name": "Trance", "text": "You do not need to sleep, and magic cannot put you to sleep. You can finish a Long Rest in 4 hours if you spend those hours in a trancelike meditation, during which you retain consciousness.", "plain": "You meditate instead of sleeping. A full night's rest takes you four hours, and sleep spells do nothing to you." }
+      ],
+      "choices": [
+        {
+          "id": "lineage",
+          "label": "Elven Lineage",
+          "help": "This decides your free cantrip and your later spells.",
+          "grant": { "type": "option", "count": 1 },
+          "options": [
+            { "id": "drow", "name": "Drow", "text": "The range of your Darkvision increases to 120 feet. You also know the Dancing Lights cantrip.", "plain": "Best eyes in the game, plus a cantrip that makes floating lights. Later: Faerie Fire at 3, Darkness at 5.", "effects": { "darkvision": 120, "cantrips": ["dancing-lights"] }, "later": { "3": "Faerie Fire", "5": "Darkness" } },
+            { "id": "high-elf", "name": "High Elf", "text": "You know the Prestidigitation cantrip. Whenever you finish a Long Rest, you can replace that cantrip with a different cantrip from the Wizard spell list.", "plain": "You get a wizard cantrip and can swap it for a different one every morning, which is genuinely great for creative problem solving. Later: Detect Magic at 3, Misty Step at 5.", "effects": { "cantrips": ["prestidigitation"], "swappableCantrip": "wizard" }, "later": { "3": "Detect Magic", "5": "Misty Step" } },
+            { "id": "wood-elf", "name": "Wood Elf", "text": "Your Speed increases to 35 feet. You also know the Druidcraft cantrip.", "plain": "You move 35 feet instead of 30, which matters more than it sounds. Later: Longstrider at 3, Pass without Trace at 5.", "effects": { "speed": 35, "cantrips": ["druidcraft"] }, "later": { "3": "Longstrider", "5": "Pass without Trace" } }
+          ]
+        },
+        { "id": "lineageAbility", "label": "Spellcasting ability for your lineage spells", "help": "Pick the one your class already uses if you are a spellcaster, otherwise Charisma is a fine default.", "grant": { "type": "ability", "from": ["int", "wis", "cha"], "count": 1, "purpose": "lineage spellcasting" } },
+        { "id": "keenSenses", "label": "Keen Senses: pick one skill", "help": "Perception is used more than any other skill.", "grant": { "type": "skill", "from": ["insight", "perception", "survival"], "count": 1 } }
+      ],
+      "effects": { "darkvision": 60 }
+    },
+    {
+      "id": "halfling",
+      "name": "Halfling",
+      "tagline": "Lucky, brave, and very hard to pin down.",
+      "plain": "Halflings reroll natural 1s. That single trait quietly saves your character more often than almost anything else on this page. They are also small, sneaky, and immune to panic.",
+      "beginnerFriendly": true,
+      "complexity": "simple",
+      "creatureType": "Humanoid",
+      "size": { "fixed": "Small", "note": "about 2-3 feet tall" },
+      "speed": 30,
+      "traits": [
+        { "name": "Brave", "text": "You have Advantage on saving throws you make to avoid or end the Frightened condition.", "plain": "Roll twice and take the better result against fear effects." },
+        { "name": "Halfling Nimbleness", "text": "You can move through the space of any creature that is a size larger than you, but you cannot stop in the same space.", "plain": "You can run between a bigger creature's legs. Handy for escaping when you are surrounded." },
+        { "name": "Luck", "text": "When you roll a 1 on the d20 of a D20 Test, you can reroll the die, and you must use the new roll.", "plain": "Natural 1s get rerolled. Attacks, saves, skill checks, all of them. This is the best beginner trait in the game." },
+        { "name": "Naturally Stealthy", "text": "You can take the Hide action even when you are obscured only by a creature that is at least one size larger than you.", "plain": "You can hide behind a friend. Most creatures need real cover." }
+      ],
+      "choices": [],
+      "effects": {}
+    },
+    {
+      "id": "orc",
+      "name": "Orc",
+      "tagline": "Refuses to go down. Great first melee character.",
+      "plain": "Orcs get a free second wind every fight and get to keep standing the first time something would drop them. If you are worried about your character dying, this is the species that protects against it.",
+      "beginnerFriendly": true,
+      "complexity": "simple",
+      "creatureType": "Humanoid",
+      "size": { "fixed": "Medium", "note": "about 6-7 feet tall" },
+      "speed": 30,
+      "traits": [
+        { "name": "Adrenaline Rush", "text": "You can take the Dash action as a Bonus Action. When you do so, you gain a number of Temporary Hit Points equal to your Proficiency Bonus. You can use this trait a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Short or Long Rest.", "plain": "Twice per rest you can double your movement without giving up your attack, and get 2 temporary hit points for free while doing it." },
+        { "name": "Darkvision", "text": "You have Darkvision with a range of 120 feet.", "plain": "You see 120 feet in the dark, double the usual range." },
+        { "name": "Relentless Endurance", "text": "When you are reduced to 0 Hit Points but not killed outright, you can drop to 1 Hit Point instead. Once you use this trait, you cannot do so again until you finish a Long Rest.", "plain": "Once per day, the hit that would knock you unconscious leaves you standing at 1 hit point instead. This is a free extra life at level 1." }
+      ],
+      "choices": [],
+      "effects": { "darkvision": 120 }
+    },
+    {
+      "id": "dragonborn",
+      "name": "Dragonborn",
+      "tagline": "Breathe fire, acid or lightning. Very popular.",
+      "plain": "You are descended from dragons and you get a breath weapon that hits everyone in a cone or line. Pick which dragon, and that decides your damage type and what you resist.",
+      "beginnerFriendly": true,
+      "complexity": "simple",
+      "creatureType": "Humanoid",
+      "size": { "fixed": "Medium", "note": "about 5-7 feet tall" },
+      "speed": 30,
+      "traits": [
+        { "name": "Draconic Ancestry", "text": "Your lineage stems from a dragon progenitor. Choose the kind of dragon from the Draconic Ancestors table. Your choice affects your Breath Weapon and Damage Resistance traits as well as your appearance.", "plain": "Pick your dragon. That is your damage type and your resistance." },
+        { "name": "Breath Weapon", "text": "When you take the Attack action on your turn, you can replace one of your attacks with an exhalation of magical energy in either a 15-foot Cone or a 30-foot Line that is 5 feet wide (choose the shape each time). Each creature in that area must make a Dexterity saving throw (DC 8 plus your Constitution modifier and Proficiency Bonus). On a failed save, a creature takes 1d10 damage of the type determined by your Draconic Ancestry trait. On a successful save, a creature takes half as much damage. This damage increases by 1d10 when you reach character levels 5 (2d10), 11 (3d10), and 17 (4d10). You can use this Breath Weapon a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.", "plain": "Twice per long rest, swap one attack for a blast that hits everything in a 15-foot cone or a 30-foot line. They take 1d10, or half if they dodge." },
+        { "name": "Damage Resistance", "text": "You have Resistance to the damage type determined by your Draconic Ancestry trait.", "plain": "Your dragon's damage type is halved against you." },
+        { "name": "Darkvision", "text": "You have Darkvision with a range of 60 feet.", "plain": "You see 60 feet in the dark." },
+        { "name": "Draconic Flight", "text": "When you reach character level 5, you can channel draconic magic to give yourself temporary flight. As a Bonus Action, you sprout spectral wings on your back that last for 10 minutes or until you retract the wings or have the Incapacitated condition. During that time, you have a Fly Speed equal to your Speed.", "plain": "At level 5 you sprout wings and fly for 10 minutes, once per long rest. Not yet at level 1." }
+      ],
+      "choices": [
+        {
+          "id": "ancestry",
+          "label": "Draconic Ancestry",
+          "help": "Mostly flavor. Fire is resisted by a lot of monsters; lightning and acid are resisted less often.",
+          "grant": { "type": "option", "count": 1 },
+          "options": [
+            { "id": "black", "name": "Black Dragon", "text": "Acid damage", "effects": { "breathDamage": "Acid", "resistances": ["Acid"] } },
+            { "id": "blue", "name": "Blue Dragon", "text": "Lightning damage", "effects": { "breathDamage": "Lightning", "resistances": ["Lightning"] } },
+            { "id": "brass", "name": "Brass Dragon", "text": "Fire damage", "effects": { "breathDamage": "Fire", "resistances": ["Fire"] } },
+            { "id": "bronze", "name": "Bronze Dragon", "text": "Lightning damage", "effects": { "breathDamage": "Lightning", "resistances": ["Lightning"] } },
+            { "id": "copper", "name": "Copper Dragon", "text": "Acid damage", "effects": { "breathDamage": "Acid", "resistances": ["Acid"] } },
+            { "id": "gold", "name": "Gold Dragon", "text": "Fire damage", "effects": { "breathDamage": "Fire", "resistances": ["Fire"] } },
+            { "id": "green", "name": "Green Dragon", "text": "Poison damage", "effects": { "breathDamage": "Poison", "resistances": ["Poison"] } },
+            { "id": "red", "name": "Red Dragon", "text": "Fire damage", "effects": { "breathDamage": "Fire", "resistances": ["Fire"] } },
+            { "id": "silver", "name": "Silver Dragon", "text": "Cold damage", "effects": { "breathDamage": "Cold", "resistances": ["Cold"] } },
+            { "id": "white", "name": "White Dragon", "text": "Cold damage", "effects": { "breathDamage": "Cold", "resistances": ["Cold"] } }
+          ]
+        }
+      ],
+      "effects": { "darkvision": 60 }
+    },
+    {
+      "id": "goliath",
+      "name": "Goliath",
+      "tagline": "Giant-blooded, fast, and hits harder than anyone.",
+      "plain": "Goliaths walk 35 feet instead of 30 and pick one giant-blood power. Several of those add real damage to your attacks, which makes Goliath one of the strongest species for a fighter type.",
+      "beginnerFriendly": true,
+      "complexity": "medium",
+      "creatureType": "Humanoid",
+      "size": { "fixed": "Medium", "note": "about 7-8 feet tall" },
+      "speed": 35,
+      "traits": [
+        { "name": "Giant Ancestry", "text": "You are descended from Giants. Choose one of the following benefits, a supernatural boon from your ancestry. You can use the chosen benefit a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest.", "plain": "Pick one giant power. You get to use it twice per long rest at level 1." },
+        { "name": "Large Form", "text": "Starting at character level 5, you can change your size to Large as a Bonus Action if you are in a big enough space. This transformation lasts for 10 minutes or until you end it. For that duration, you have Advantage on Strength checks, and your Speed increases by 10 feet.", "plain": "At level 5 you can grow to Large size for 10 minutes. Not yet at level 1." },
+        { "name": "Powerful Build", "text": "You have Advantage on any ability check you make to end the Grappled condition. You also count as one size larger when determining your carrying capacity.", "plain": "You break out of grapples easily and can carry twice as much gear." }
+      ],
+      "choices": [
+        {
+          "id": "giantAncestry",
+          "label": "Giant Ancestry",
+          "help": "Fire's Burn and Hill's Tumble are the easiest to use well. Stone's Endurance is the best defensive pick.",
+          "grant": { "type": "option", "count": 1 },
+          "options": [
+            { "id": "cloud", "name": "Cloud's Jaunt (Cloud Giant)", "text": "As a Bonus Action, you magically teleport up to 30 feet to an unoccupied space you can see.", "plain": "Blink 30 feet as a bonus action. Great for escaping or reaching an archer." },
+            { "id": "fire", "name": "Fire's Burn (Fire Giant)", "text": "When you hit a target with an attack roll and deal damage to it, you can also deal 1d10 Fire damage to that target.", "plain": "Add 1d10 fire damage to a hit. The biggest damage bump available, and simple to use." },
+            { "id": "frost", "name": "Frost's Chill (Frost Giant)", "text": "When you hit a target with an attack roll and deal damage to it, you can also deal 1d6 Cold damage to that target and reduce its Speed by 10 feet until the start of your next turn.", "plain": "Add 1d6 cold damage and slow the target down. Good for keeping something away from your friends." },
+            { "id": "hill", "name": "Hill's Tumble (Hill Giant)", "text": "When you hit a Large or smaller creature with an attack roll and deal damage to it, you can give that target the Prone condition.", "plain": "Knock the target flat. Everyone attacking it in melee then gets advantage. Very strong in a party." },
+            { "id": "stone", "name": "Stone's Endurance (Stone Giant)", "text": "When you take damage, you can take a Reaction to roll 1d12. Add your Constitution modifier to the number rolled and reduce the damage by that total.", "plain": "Cancel a chunk of incoming damage as a reaction. The safest choice." },
+            { "id": "storm", "name": "Storm's Thunder (Storm Giant)", "text": "When you take damage from a creature within 60 feet of you, you can take a Reaction to deal 1d8 Thunder damage to that creature.", "plain": "Hurt anything that hurts you, even at range." }
+          ]
+        }
+      ],
+      "effects": {}
+    },
+    {
+      "id": "gnome",
+      "name": "Gnome",
+      "tagline": "Small, clever, and weirdly hard to mind-control.",
+      "plain": "Gnomes have advantage on Intelligence, Wisdom and Charisma saves, which covers most of the nasty save-or-lose spells in the game. Then they pick a lineage for some free magic.",
+      "beginnerFriendly": true,
+      "complexity": "medium",
+      "creatureType": "Humanoid",
+      "size": { "fixed": "Small", "note": "about 3-4 feet tall" },
+      "speed": 30,
+      "traits": [
+        { "name": "Darkvision", "text": "You have Darkvision with a range of 60 feet.", "plain": "You see 60 feet in the dark." },
+        { "name": "Gnomish Cunning", "text": "You have Advantage on Intelligence, Wisdom, and Charisma saving throws.", "plain": "Roll twice and take the better result on three of the six saving throws. Genuinely excellent, because the scariest spells target exactly these." },
+        { "name": "Gnomish Lineage", "text": "You are part of a lineage that grants you supernatural abilities. Choose one of the following options. Whichever one you choose, Intelligence, Wisdom, or Charisma is your spellcasting ability for the spells you cast with this trait.", "plain": "Pick Forest or Rock gnome for your free magic." }
+      ],
+      "choices": [
+        {
+          "id": "lineage",
+          "label": "Gnomish Lineage",
+          "help": "Forest is better in play, Rock is more fun to roleplay with.",
+          "grant": { "type": "option", "count": 1 },
+          "options": [
+            { "id": "forest", "name": "Forest Gnome", "text": "You know the Minor Illusion cantrip. You also always have the Speak with Animals spell prepared. You can cast it without a spell slot a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Long Rest. You can also use any spell slots you have to cast the spell.", "plain": "Minor Illusion is one of the most creative cantrips in the game, and you can talk to animals twice a day for free.", "effects": { "cantrips": ["minor-illusion"], "freeSpells": ["speak-with-animals"] } },
+            { "id": "rock", "name": "Rock Gnome", "text": "You know the Mending and Prestidigitation cantrips. In addition, you can spend 10 minutes casting Prestidigitation to create a Tiny clockwork device (AC 5, 1 HP), such as a toy, fire starter, or music box. You can have three such devices in existence at a time, and each falls apart 8 hours after its creation or when you dismantle it with a touch as a Utilize action.", "plain": "Two utility cantrips, plus you can build little clockwork gadgets that do one Prestidigitation effect on command.", "effects": { "cantrips": ["mending", "prestidigitation"] } }
+          ]
+        },
+        { "id": "lineageAbility", "label": "Spellcasting ability for your lineage spells", "help": "Match your class if you cast spells, otherwise Intelligence is thematic for gnomes.", "grant": { "type": "ability", "from": ["int", "wis", "cha"], "count": 1, "purpose": "lineage spellcasting" } }
+      ],
+      "effects": { "darkvision": 60 }
+    },
+    {
+      "id": "tiefling",
+      "name": "Tiefling",
+      "tagline": "Fiendish heritage, free spells at every tier.",
+      "plain": "Tieflings pick a legacy that grants a damage resistance, a free cantrip now, and a real spell at levels 3 and 5. Everyone also gets Thaumaturgy, a cantrip built for dramatic entrances.",
+      "beginnerFriendly": true,
+      "complexity": "medium",
+      "creatureType": "Humanoid",
+      "size": { "choice": ["Medium", "Small"], "note": "Medium is about 4-7 feet tall; Small is about 3-4 feet tall." },
+      "speed": 30,
+      "traits": [
+        { "name": "Darkvision", "text": "You have Darkvision with a range of 60 feet.", "plain": "You see 60 feet in the dark." },
+        { "name": "Fiendish Legacy", "text": "You are the recipient of a legacy that grants you supernatural abilities. Choose a legacy from the Fiendish Legacies table. You gain the level 1 benefit of the chosen legacy. When you reach character levels 3 and 5, you learn a higher-level spell, as shown on the table. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest.", "plain": "Pick Abyssal, Chthonic or Infernal. Each gives a resistance and a cantrip now, plus free spells later." },
+        { "name": "Otherworldly Presence", "text": "You know the Thaumaturgy cantrip. When you cast it with this trait, the spell uses the same spellcasting ability you use for your Fiendish Legacy trait.", "plain": "Thaumaturgy makes your voice boom, your eyes glow, or doors slam open. No combat use, enormous roleplay use." }
+      ],
+      "choices": [
+        {
+          "id": "legacy",
+          "label": "Fiendish Legacy",
+          "help": "Infernal gives Fire Bolt, a real damage cantrip, so it is the strongest pick if you are not already a spellcaster.",
+          "grant": { "type": "option", "count": 1 },
+          "options": [
+            { "id": "abyssal", "name": "Abyssal", "text": "You have Resistance to Poison damage. You also know the Poison Spray cantrip.", "plain": "Poison resistance and a poison damage cantrip. Later: Ray of Sickness at 3, Hold Person at 5.", "effects": { "resistances": ["Poison"], "cantrips": ["poison-spray"] }, "later": { "3": "Ray of Sickness", "5": "Hold Person" } },
+            { "id": "chthonic", "name": "Chthonic", "text": "You have Resistance to Necrotic damage. You also know the Chill Touch cantrip.", "plain": "Necrotic resistance, which is common against undead. Later: False Life at 3, Ray of Enfeeblement at 5.", "effects": { "resistances": ["Necrotic"], "cantrips": ["chill-touch"] }, "later": { "3": "False Life", "5": "Ray of Enfeeblement" } },
+            { "id": "infernal", "name": "Infernal", "text": "You have Resistance to Fire damage. You also know the Fire Bolt cantrip.", "plain": "Fire resistance plus Fire Bolt, the best attack cantrip on this list. Later: Hellish Rebuke at 3, Darkness at 5.", "effects": { "resistances": ["Fire"], "cantrips": ["fire-bolt"] }, "later": { "3": "Hellish Rebuke", "5": "Darkness" } }
+          ]
+        },
+        { "id": "legacyAbility", "label": "Spellcasting ability for your legacy spells", "help": "Charisma fits tieflings best and matches Bard, Sorcerer, Warlock and Paladin.", "grant": { "type": "ability", "from": ["int", "wis", "cha"], "count": 1, "purpose": "legacy spellcasting" } }
+      ],
+      "effects": { "darkvision": 60, "cantrips": ["thaumaturgy"] }
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "abilities": [
+    { "id": "str", "name": "Strength",     "short": "STR", "blurb": "Raw physical power. Melee attacks with most weapons, shoving, climbing, carrying.", "usedBy": "Barbarian, Fighter, Paladin" },
+    { "id": "dex", "name": "Dexterity",    "short": "DEX", "blurb": "Agility and reflexes. Ranged and finesse attacks, Armor Class in light armor, initiative, stealth.", "usedBy": "Rogue, Monk, Ranger" },
+    { "id": "con", "name": "Constitution", "short": "CON", "blurb": "Health and stamina. Adds to your hit points at every level. Nobody dumps this one.", "usedBy": "Everyone" },
+    { "id": "int", "name": "Intelligence", "short": "INT", "blurb": "Reasoning and recall. Wizard spellcasting, plus Arcana, History, Investigation, Nature, Religion.", "usedBy": "Wizard" },
+    { "id": "wis", "name": "Wisdom",       "short": "WIS", "blurb": "Awareness and insight. Cleric and Druid spellcasting, Perception, and the most common saving throw in the game.", "usedBy": "Cleric, Druid, Ranger, Monk" },
+    { "id": "cha", "name": "Charisma",     "short": "CHA", "blurb": "Force of personality. Bard, Sorcerer, Warlock and Paladin spellcasting, plus most social skills.", "usedBy": "Bard, Sorcerer, Warlock, Paladin" }
+  ],
+  "skills": [
+    { "id": "acrobatics",     "name": "Acrobatics",      "ability": "dex", "blurb": "Keeping your balance, tumbling, wriggling out of a grapple." },
+    { "id": "animalhandling", "name": "Animal Handling", "ability": "wis", "blurb": "Calming a spooked horse, reading an animal's intentions, training a beast." },
+    { "id": "arcana",         "name": "Arcana",          "ability": "int", "blurb": "Recalling lore about spells, magic items, planes and eldritch symbols." },
+    { "id": "athletics",      "name": "Athletics",       "ability": "str", "blurb": "Climbing, jumping, swimming, shoving, and winning a grapple." },
+    { "id": "deception",      "name": "Deception",       "ability": "cha", "blurb": "Lying convincingly, disguising your motives, running a con." },
+    { "id": "history",        "name": "History",         "ability": "int", "blurb": "Recalling wars, dynasties, ancient ruins and lost civilizations." },
+    { "id": "insight",        "name": "Insight",         "ability": "wis", "blurb": "Reading body language to tell whether someone is lying or hiding something." },
+    { "id": "intimidation",   "name": "Intimidation",    "ability": "cha", "blurb": "Getting your way through threats, hostility and physical presence." },
+    { "id": "investigation",  "name": "Investigation",   "ability": "int", "blurb": "Searching for clues and reasoning out what they mean. Finding the hidden catch." },
+    { "id": "medicine",       "name": "Medicine",        "ability": "wis", "blurb": "Stabilizing a dying friend, diagnosing an illness, spotting a cause of death." },
+    { "id": "nature",         "name": "Nature",          "ability": "int", "blurb": "Recalling facts about terrain, plants, animals and weather." },
+    { "id": "perception",     "name": "Perception",      "ability": "wis", "blurb": "Noticing things. The single most-rolled skill in the game." },
+    { "id": "performance",    "name": "Performance",     "ability": "cha", "blurb": "Entertaining a crowd with music, dance, acting or storytelling." },
+    { "id": "persuasion",     "name": "Persuasion",      "ability": "cha", "blurb": "Winning people over honestly through tact, charm and good faith." },
+    { "id": "religion",       "name": "Religion",        "ability": "int", "blurb": "Recalling deities, rites, holy symbols and the practices of cults." },
+    { "id": "sleightofhand",  "name": "Sleight of Hand", "ability": "dex", "blurb": "Picking pockets, palming objects, planting something on someone." },
+    { "id": "stealth",        "name": "Stealth",         "ability": "dex", "blurb": "Hiding, moving quietly, slipping past guards unseen." },
+    { "id": "survival",       "name": "Survival",        "ability": "wis", "blurb": "Tracking, foraging, navigating the wilds, predicting the weather." }
+  ],
+  "standardArray": [15, 14, 13, 12, 10, 8],
+  "pointBuy": {
+    "budget": 27,
+    "min": 8,
+    "max": 15,
+    "costs": { "8": 0, "9": 1, "10": 2, "11": 3, "12": 4, "13": 5, "14": 7, "15": 9 }
+  },
+  "glossary": [
+    { "term": "Ability Modifier", "text": "The number you actually add to rolls, derived from an ability score. Score 10-11 gives +0, and every 2 points above or below shifts it by 1. A 16 gives +3, an 8 gives -1." },
+    { "term": "Proficiency Bonus", "text": "A flat bonus you add when you are trained in what you are doing. It is +2 at level 1 and grows as you level up. You add it to attacks with weapons you are proficient in, skills you are proficient in, saving throws your class grants, and your spell save DC." },
+    { "term": "Armor Class (AC)", "text": "How hard you are to hit. An attacker must roll a d20 plus their bonuses and meet or beat your AC." },
+    { "term": "Hit Points (HP)", "text": "How much damage you can take before you drop. At level 1 you get the maximum roll of your class's Hit Die plus your Constitution modifier." },
+    { "term": "Saving Throw", "text": "A d20 roll to resist something happening to you: a fireball, a poison, a charm effect. Your class gives you proficiency in two of the six." },
+    { "term": "Advantage", "text": "Roll two d20s and use the higher one. Disadvantage is the same but you use the lower. They cancel each other out entirely, and they never stack." },
+    { "term": "Spell Save DC", "text": "The number an enemy must beat on a saving throw to resist your spell. It equals 8 + your proficiency bonus + your spellcasting ability modifier." },
+    { "term": "Cantrip", "text": "A level 0 spell you can cast at will, as often as you like, without using a spell slot. They are always prepared." },
+    { "term": "Spell Slot", "text": "A limited resource you spend to cast a leveled spell. At level 1 you have two 1st-level slots (if you are a full caster) and regain them on a Long Rest." },
+    { "term": "Prepared Spells", "text": "In the 2024 rules most casters choose a list of prepared spells after a Long Rest. Any prepared spell can be cast using any available slot, as many times as your slots allow." },
+    { "term": "Concentration", "text": "Some spells stay active only while you concentrate. You can concentrate on one spell at a time, and taking damage forces a Constitution save to keep it going." },
+    { "term": "Ritual", "text": "A spell tagged as a ritual can be cast without spending a spell slot if you take 10 extra minutes to do it." },
+    { "term": "Weapon Mastery", "text": "New in the 2024 rules. Martial classes unlock a special property on specific weapons, like knocking a target prone or sliding it 10 feet. You get it only with the weapons you chose." },
+    { "term": "Heroic Inspiration", "text": "A reward your DM hands out. Spend it to reroll any d20 you just rolled, and you must use the new result." },
+    { "term": "Long Rest", "text": "8 hours of downtime. You regain all hit points and all spell slots, and most class features reset." },
+    { "term": "Short Rest", "text": "1 hour of downtime. You can spend Hit Dice to heal, and some class features recharge." }
+  ]
+}

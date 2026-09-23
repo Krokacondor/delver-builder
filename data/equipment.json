@@ -1,0 +1,112 @@
+{
+  "note": "Equipment tables and rules text from SRD 5.2.1 (CC-BY-4.0). 'plain' fields are original.",
+  "masteryProperties": [
+    { "id": "cleave", "name": "Cleave", "text": "If you hit a creature with a melee attack roll using this weapon, you can make a melee attack roll with the weapon against a second creature within 5 feet of the first that is also within your reach. On a hit, the second creature takes the weapon's damage, but don't add your ability modifier to that damage unless that modifier is negative. You can make this extra attack only once per turn.", "plain": "Hit one enemy, get a free swing at a second enemy standing next to it." },
+    { "id": "graze", "name": "Graze", "text": "If your attack roll with this weapon misses a creature, you can deal damage to that creature equal to the ability modifier you used to make the attack roll. This damage is the same type dealt by the weapon.", "plain": "Even when you miss, you still chip in your ability modifier as damage. You never fully whiff." },
+    { "id": "nick", "name": "Nick", "text": "When you make the extra attack of the Light property, you can make it as part of the Attack action instead of as a Bonus Action. You can make this extra attack only once per turn.", "plain": "Your off-hand attack becomes free, so your bonus action stays open for something else." },
+    { "id": "push", "name": "Push", "text": "If you hit a creature with this weapon, you can push the creature up to 10 feet straight away from yourself if it is Large or smaller.", "plain": "Shove the target 10 feet back. Good for knocking things off ledges or away from your friends." },
+    { "id": "sap", "name": "Sap", "text": "If you hit a creature with this weapon, that creature has Disadvantage on its next attack roll before the start of your next turn.", "plain": "The target rolls twice and takes the worse result on its next attack. Quietly one of the best." },
+    { "id": "slow", "name": "Slow", "text": "If you hit a creature with this weapon and deal damage to it, you can reduce its Speed by 10 feet until the start of your next turn. If the creature is hit more than once by weapons that have this property, the Speed reduction doesn't exceed 10 feet.", "plain": "Cut the target's movement by 10 feet. Great for archers keeping enemies at range." },
+    { "id": "topple", "name": "Topple", "text": "If you hit a creature with this weapon, you can force the creature to make a Constitution saving throw (DC 8 plus the ability modifier used to make the attack roll and your Proficiency Bonus). On a failed save, the creature has the Prone condition.", "plain": "Knock the target flat on its back. Everyone in melee then gets advantage against it." },
+    { "id": "vex", "name": "Vex", "text": "If you hit a creature with this weapon and deal damage to the creature, you have Advantage on your next attack roll against that creature before the end of your next turn.", "plain": "Hit once, and your next attack on that target has advantage. Snowballs nicely." }
+  ],
+  "weaponProperties": [
+    { "id": "ammunition", "name": "Ammunition", "text": "You can use a weapon that has the Ammunition property to make a ranged attack only if you have ammunition to fire from it." },
+    { "id": "finesse", "name": "Finesse", "text": "When making an attack with a Finesse weapon, use your choice of your Strength or Dexterity modifier for the attack and damage rolls. You must use the same modifier for both rolls.", "plain": "You may use Dexterity instead of Strength. This is what lets rogues and dex-builds fight in melee." },
+    { "id": "heavy", "name": "Heavy", "text": "You have Disadvantage on attack rolls with a Heavy weapon if it is a Melee weapon and your Strength score is less than 13, or a Ranged weapon and your Dexterity score is less than 13." },
+    { "id": "light", "name": "Light", "text": "When you take the Attack action on your turn and attack with a Light weapon, you can make one extra attack as a Bonus Action later on the same turn with a different Light weapon.", "plain": "Lets you fight with two weapons for a free extra attack as a bonus action." },
+    { "id": "loading", "name": "Loading", "text": "You can fire only one piece of ammunition from a Loading weapon when you use an action, a Bonus Action, or a Reaction to fire it, regardless of the number of attacks you can normally make." },
+    { "id": "reach", "name": "Reach", "text": "A Reach weapon adds 5 feet to your reach when you attack with it, as well as when determining your reach for Opportunity Attacks with it." },
+    { "id": "thrown", "name": "Thrown", "text": "If a weapon has the Thrown property, you can throw the weapon to make a ranged attack, and you can draw that weapon as part of the attack. If the weapon is a Melee weapon, use the same ability modifier for the attack and damage rolls that you use for a melee attack with that weapon." },
+    { "id": "two-handed", "name": "Two-Handed", "text": "A Two-Handed weapon requires two hands when you attack with it." },
+    { "id": "versatile", "name": "Versatile", "text": "A Versatile weapon can be used with one or two hands. A damage value in parentheses appears with the property. The weapon deals that damage when used with two hands to make a melee attack." }
+  ],
+  "weapons": [
+    { "name": "Club", "category": "simple", "range": "melee", "damage": "1d4", "damageType": "Bludgeoning", "properties": ["Light"], "mastery": "slow", "weight": "2 lb.", "cost": "1 SP" },
+    { "name": "Dagger", "category": "simple", "range": "melee", "damage": "1d4", "damageType": "Piercing", "properties": ["Finesse", "Light", "Thrown (Range 20/60)"], "mastery": "nick", "weight": "1 lb.", "cost": "2 GP" },
+    { "name": "Greatclub", "category": "simple", "range": "melee", "damage": "1d8", "damageType": "Bludgeoning", "properties": ["Two-Handed"], "mastery": "push", "weight": "10 lb.", "cost": "2 SP" },
+    { "name": "Handaxe", "category": "simple", "range": "melee", "damage": "1d6", "damageType": "Slashing", "properties": ["Light", "Thrown (Range 20/60)"], "mastery": "vex", "weight": "2 lb.", "cost": "5 GP" },
+    { "name": "Javelin", "category": "simple", "range": "melee", "damage": "1d6", "damageType": "Piercing", "properties": ["Thrown (Range 30/120)"], "mastery": "slow", "weight": "2 lb.", "cost": "5 SP" },
+    { "name": "Light Hammer", "category": "simple", "range": "melee", "damage": "1d4", "damageType": "Bludgeoning", "properties": ["Light", "Thrown (Range 20/60)"], "mastery": "nick", "weight": "2 lb.", "cost": "2 GP" },
+    { "name": "Mace", "category": "simple", "range": "melee", "damage": "1d6", "damageType": "Bludgeoning", "properties": [], "mastery": "sap", "weight": "4 lb.", "cost": "5 GP" },
+    { "name": "Quarterstaff", "category": "simple", "range": "melee", "damage": "1d6", "damageType": "Bludgeoning", "properties": ["Versatile (1d8)"], "mastery": "topple", "weight": "4 lb.", "cost": "2 SP" },
+    { "name": "Sickle", "category": "simple", "range": "melee", "damage": "1d4", "damageType": "Slashing", "properties": ["Light"], "mastery": "nick", "weight": "2 lb.", "cost": "1 GP" },
+    { "name": "Spear", "category": "simple", "range": "melee", "damage": "1d6", "damageType": "Piercing", "properties": ["Thrown (Range 20/60)", "Versatile (1d8)"], "mastery": "sap", "weight": "3 lb.", "cost": "1 GP" },
+
+    { "name": "Dart", "category": "simple", "range": "ranged", "damage": "1d4", "damageType": "Piercing", "properties": ["Finesse", "Thrown (Range 20/60)"], "mastery": "vex", "weight": "1/4 lb.", "cost": "5 CP" },
+    { "name": "Light Crossbow", "category": "simple", "range": "ranged", "damage": "1d8", "damageType": "Piercing", "properties": ["Ammunition (Range 80/320; Bolt)", "Loading", "Two-Handed"], "mastery": "slow", "weight": "5 lb.", "cost": "25 GP" },
+    { "name": "Shortbow", "category": "simple", "range": "ranged", "damage": "1d6", "damageType": "Piercing", "properties": ["Ammunition (Range 80/320; Arrow)", "Two-Handed"], "mastery": "vex", "weight": "2 lb.", "cost": "25 GP" },
+    { "name": "Sling", "category": "simple", "range": "ranged", "damage": "1d4", "damageType": "Bludgeoning", "properties": ["Ammunition (Range 30/120; Bullet)"], "mastery": "slow", "weight": "—", "cost": "1 SP" },
+
+    { "name": "Battleaxe", "category": "martial", "range": "melee", "damage": "1d8", "damageType": "Slashing", "properties": ["Versatile (1d10)"], "mastery": "topple", "weight": "4 lb.", "cost": "10 GP" },
+    { "name": "Flail", "category": "martial", "range": "melee", "damage": "1d8", "damageType": "Bludgeoning", "properties": [], "mastery": "sap", "weight": "2 lb.", "cost": "10 GP" },
+    { "name": "Glaive", "category": "martial", "range": "melee", "damage": "1d10", "damageType": "Slashing", "properties": ["Heavy", "Reach", "Two-Handed"], "mastery": "graze", "weight": "6 lb.", "cost": "20 GP" },
+    { "name": "Greataxe", "category": "martial", "range": "melee", "damage": "1d12", "damageType": "Slashing", "properties": ["Heavy", "Two-Handed"], "mastery": "cleave", "weight": "7 lb.", "cost": "30 GP" },
+    { "name": "Greatsword", "category": "martial", "range": "melee", "damage": "2d6", "damageType": "Slashing", "properties": ["Heavy", "Two-Handed"], "mastery": "graze", "weight": "6 lb.", "cost": "50 GP" },
+    { "name": "Halberd", "category": "martial", "range": "melee", "damage": "1d10", "damageType": "Slashing", "properties": ["Heavy", "Reach", "Two-Handed"], "mastery": "cleave", "weight": "6 lb.", "cost": "20 GP" },
+    { "name": "Lance", "category": "martial", "range": "melee", "damage": "1d10", "damageType": "Piercing", "properties": ["Heavy", "Reach", "Two-Handed (unless mounted)"], "mastery": "topple", "weight": "6 lb.", "cost": "10 GP" },
+    { "name": "Longsword", "category": "martial", "range": "melee", "damage": "1d8", "damageType": "Slashing", "properties": ["Versatile (1d10)"], "mastery": "sap", "weight": "3 lb.", "cost": "15 GP" },
+    { "name": "Maul", "category": "martial", "range": "melee", "damage": "2d6", "damageType": "Bludgeoning", "properties": ["Heavy", "Two-Handed"], "mastery": "topple", "weight": "10 lb.", "cost": "10 GP" },
+    { "name": "Morningstar", "category": "martial", "range": "melee", "damage": "1d8", "damageType": "Piercing", "properties": [], "mastery": "sap", "weight": "4 lb.", "cost": "15 GP" },
+    { "name": "Pike", "category": "martial", "range": "melee", "damage": "1d10", "damageType": "Piercing", "properties": ["Heavy", "Reach", "Two-Handed"], "mastery": "push", "weight": "18 lb.", "cost": "5 GP" },
+    { "name": "Rapier", "category": "martial", "range": "melee", "damage": "1d8", "damageType": "Piercing", "properties": ["Finesse"], "mastery": "vex", "weight": "2 lb.", "cost": "25 GP" },
+    { "name": "Scimitar", "category": "martial", "range": "melee", "damage": "1d6", "damageType": "Slashing", "properties": ["Finesse", "Light"], "mastery": "nick", "weight": "3 lb.", "cost": "25 GP" },
+    { "name": "Shortsword", "category": "martial", "range": "melee", "damage": "1d6", "damageType": "Piercing", "properties": ["Finesse", "Light"], "mastery": "vex", "weight": "2 lb.", "cost": "10 GP" },
+    { "name": "Trident", "category": "martial", "range": "melee", "damage": "1d8", "damageType": "Piercing", "properties": ["Thrown (Range 20/60)", "Versatile (1d10)"], "mastery": "topple", "weight": "4 lb.", "cost": "5 GP" },
+    { "name": "Warhammer", "category": "martial", "range": "melee", "damage": "1d8", "damageType": "Bludgeoning", "properties": ["Versatile (1d10)"], "mastery": "push", "weight": "5 lb.", "cost": "15 GP" },
+    { "name": "War Pick", "category": "martial", "range": "melee", "damage": "1d8", "damageType": "Piercing", "properties": ["Versatile (1d10)"], "mastery": "sap", "weight": "2 lb.", "cost": "5 GP" },
+    { "name": "Whip", "category": "martial", "range": "melee", "damage": "1d4", "damageType": "Slashing", "properties": ["Finesse", "Reach"], "mastery": "slow", "weight": "3 lb.", "cost": "2 GP" },
+
+    { "name": "Blowgun", "category": "martial", "range": "ranged", "damage": "1", "damageType": "Piercing", "properties": ["Ammunition (Range 25/100; Needle)", "Loading"], "mastery": "vex", "weight": "1 lb.", "cost": "10 GP" },
+    { "name": "Hand Crossbow", "category": "martial", "range": "ranged", "damage": "1d6", "damageType": "Piercing", "properties": ["Ammunition (Range 30/120; Bolt)", "Light", "Loading"], "mastery": "vex", "weight": "3 lb.", "cost": "75 GP" },
+    { "name": "Heavy Crossbow", "category": "martial", "range": "ranged", "damage": "1d10", "damageType": "Piercing", "properties": ["Ammunition (Range 100/400; Bolt)", "Heavy", "Loading", "Two-Handed"], "mastery": "push", "weight": "18 lb.", "cost": "50 GP" },
+    { "name": "Longbow", "category": "martial", "range": "ranged", "damage": "1d8", "damageType": "Piercing", "properties": ["Ammunition (Range 150/600; Arrow)", "Heavy", "Two-Handed"], "mastery": "slow", "weight": "2 lb.", "cost": "50 GP" },
+    { "name": "Musket", "category": "martial", "range": "ranged", "damage": "1d12", "damageType": "Piercing", "properties": ["Ammunition (Range 40/120; Bullet)", "Loading", "Two-Handed"], "mastery": "slow", "weight": "10 lb.", "cost": "500 GP" },
+    { "name": "Pistol", "category": "martial", "range": "ranged", "damage": "1d10", "damageType": "Piercing", "properties": ["Ammunition (Range 30/90; Bullet)", "Loading"], "mastery": "vex", "weight": "3 lb.", "cost": "250 GP" }
+  ],
+  "armorRules": {
+    "untrained": "If you wear Light, Medium, or Heavy armor and lack training with it, you have Disadvantage on any D20 Test that involves Strength or Dexterity, and you can't cast spells.",
+    "shield": "You gain the Armor Class benefit of a Shield only if you have training with it.",
+    "oneAtATime": "A creature can wear only one suit of armor at a time and wield only one Shield at a time."
+  },
+  "armor": [
+    { "name": "Padded Armor", "category": "light", "baseAC": 11, "addDex": true, "dexMax": null, "strength": null, "stealthDisadvantage": true, "weight": "8 lb.", "cost": "5 GP" },
+    { "name": "Leather Armor", "category": "light", "baseAC": 11, "addDex": true, "dexMax": null, "strength": null, "stealthDisadvantage": false, "weight": "10 lb.", "cost": "10 GP" },
+    { "name": "Studded Leather Armor", "category": "light", "baseAC": 12, "addDex": true, "dexMax": null, "strength": null, "stealthDisadvantage": false, "weight": "13 lb.", "cost": "45 GP" },
+    { "name": "Hide Armor", "category": "medium", "baseAC": 12, "addDex": true, "dexMax": 2, "strength": null, "stealthDisadvantage": false, "weight": "12 lb.", "cost": "10 GP" },
+    { "name": "Chain Shirt", "category": "medium", "baseAC": 13, "addDex": true, "dexMax": 2, "strength": null, "stealthDisadvantage": false, "weight": "20 lb.", "cost": "50 GP" },
+    { "name": "Scale Mail", "category": "medium", "baseAC": 14, "addDex": true, "dexMax": 2, "strength": null, "stealthDisadvantage": true, "weight": "45 lb.", "cost": "50 GP" },
+    { "name": "Breastplate", "category": "medium", "baseAC": 14, "addDex": true, "dexMax": 2, "strength": null, "stealthDisadvantage": false, "weight": "20 lb.", "cost": "400 GP" },
+    { "name": "Half Plate Armor", "category": "medium", "baseAC": 15, "addDex": true, "dexMax": 2, "strength": null, "stealthDisadvantage": true, "weight": "40 lb.", "cost": "750 GP" },
+    { "name": "Ring Mail", "category": "heavy", "baseAC": 14, "addDex": false, "dexMax": 0, "strength": null, "stealthDisadvantage": true, "weight": "40 lb.", "cost": "30 GP" },
+    { "name": "Chain Mail", "category": "heavy", "baseAC": 16, "addDex": false, "dexMax": 0, "strength": 13, "stealthDisadvantage": true, "weight": "55 lb.", "cost": "75 GP" },
+    { "name": "Splint Armor", "category": "heavy", "baseAC": 17, "addDex": false, "dexMax": 0, "strength": 15, "stealthDisadvantage": true, "weight": "60 lb.", "cost": "200 GP" },
+    { "name": "Plate Armor", "category": "heavy", "baseAC": 18, "addDex": false, "dexMax": 0, "strength": 15, "stealthDisadvantage": true, "weight": "65 lb.", "cost": "1,500 GP" }
+  ],
+  "shield": { "name": "Shield", "acBonus": 2, "weight": "6 lb.", "cost": "10 GP" },
+  "packs": [
+    { "name": "Burglar's Pack", "cost": "16 GP", "contents": ["Backpack", "Ball Bearings", "Bell", "10 Candles", "Crowbar", "Hooded Lantern", "7 flasks of Oil", "5 days of Rations", "Rope", "Tinderbox", "Waterskin"] },
+    { "name": "Diplomat's Pack", "cost": "39 GP", "contents": ["Chest", "Fine Clothes", "Ink", "5 Ink Pens", "Lamp", "2 Map or Scroll Cases", "4 flasks of Oil", "5 sheets of Paper", "5 sheets of Parchment", "Perfume", "Tinderbox"] },
+    { "name": "Dungeoneer's Pack", "cost": "12 GP", "contents": ["Backpack", "Caltrops", "Crowbar", "2 flasks of Oil", "10 days of Rations", "Rope", "Tinderbox", "10 Torches", "Waterskin"] },
+    { "name": "Entertainer's Pack", "cost": "40 GP", "contents": ["Backpack", "Bedroll", "Bell", "Bullseye Lantern", "3 Costumes", "Mirror", "8 flasks of Oil", "9 days of Rations", "Tinderbox", "Waterskin"] },
+    { "name": "Explorer's Pack", "cost": "10 GP", "contents": ["Backpack", "Bedroll", "2 flasks of Oil", "10 days of Rations", "Rope", "Tinderbox", "10 Torches", "Waterskin"] },
+    { "name": "Priest's Pack", "cost": "33 GP", "contents": ["Backpack", "Blanket", "Holy Water", "Lamp", "7 days of Rations", "Robe", "Tinderbox"] },
+    { "name": "Scholar's Pack", "cost": "40 GP", "contents": ["Backpack", "Book", "Ink", "Ink Pen", "Lamp", "10 flasks of Oil", "10 sheets of Parchment", "Tinderbox"] }
+  ],
+  "focuses": {
+    "druidic": { "name": "Druidic Focus", "options": ["Sprig of mistletoe (1 GP)", "Wooden staff, also a Quarterstaff (5 GP)", "Yew wand (10 GP)"], "usedBy": ["Druid", "Ranger"] },
+    "holy": { "name": "Holy Symbol", "options": ["Amulet (5 GP)", "Emblem (5 GP)", "Reliquary (5 GP)"], "usedBy": ["Cleric", "Paladin"] },
+    "arcane": { "name": "Arcane Focus", "options": ["Crystal (10 GP)", "Orb (20 GP)", "Rod (10 GP)", "Staff, also a Quarterstaff (5 GP)", "Wand (10 GP)"], "usedBy": ["Sorcerer", "Warlock", "Wizard"] }
+  },
+  "toolCategories": {
+    "gamingSet": ["Dice Set", "Dragonchess Set", "Playing Card Set", "Three-Dragon Ante Set"],
+    "musicalInstrument": ["Bagpipes", "Drum", "Dulcimer", "Flute", "Horn", "Lute", "Lyre", "Pan Flute", "Shawm", "Viol"],
+    "artisansTools": ["Alchemist's Supplies", "Brewer's Supplies", "Calligrapher's Supplies", "Carpenter's Tools", "Cartographer's Tools", "Cobbler's Tools", "Cook's Utensils", "Glassblower's Tools", "Jeweler's Tools", "Leatherworker's Tools", "Mason's Tools", "Painter's Supplies", "Potter's Tools", "Smith's Tools", "Tinker's Tools", "Weaver's Tools", "Woodcarver's Tools"],
+    "other": ["Disguise Kit", "Forgery Kit", "Herbalism Kit", "Navigator's Tools", "Poisoner's Kit", "Thieves' Tools"]
+  },
+  "languages": {
+    "standard": ["Common", "Common Sign Language", "Draconic", "Dwarvish", "Elvish", "Giant", "Gnomish", "Goblin", "Halfling", "Orc"],
+    "rare": ["Abyssal", "Celestial", "Deep Speech", "Druidic", "Infernal", "Primordial", "Sylvan", "Thieves' Cant", "Undercommon"],
+    "note": "Every character knows Common plus two more languages of your choice from the standard list. Rare languages usually come from a class or DM permission."
+  }
+}

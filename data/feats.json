@@ -1,0 +1,165 @@
+{
+  "note": "Feat rules text from SRD 5.2.1 (CC-BY-4.0). 'plain' fields are original plain-language rewrites.",
+  "rules": {
+    "intro": "A feat is a special talent. At level 1 you get an Origin feat from your background, and Humans get a second one. The other categories (General, Fighting Style, Epic Boon) come at higher levels.",
+    "categories": {
+      "origin": "Small feats you get at level 1. Everyone gets one from their background.",
+      "general": "Bigger feats, available from level 4 onward when your class offers an Ability Score Improvement.",
+      "fightingStyle": "Combat specialties. Fighters pick one at level 1; Rangers and Paladins at level 2.",
+      "epicBoon": "Level 19+ only. Listed here for completeness."
+    }
+  },
+  "feats": [
+    {
+      "id": "alert",
+      "name": "Alert",
+      "category": "origin",
+      "plain": "You act sooner in combat, and you can hand your turn order to a friend who needs to go first. Simple and always useful.",
+      "benefits": [
+        { "name": "Initiative Proficiency", "text": "When you roll Initiative, you can add your Proficiency Bonus to the roll." },
+        { "name": "Initiative Swap", "text": "Immediately after you roll Initiative, you can swap your Initiative with the Initiative of one willing ally in the same combat. You cannot make this swap if you or the ally has the Incapacitated condition." }
+      ],
+      "effects": { "initiativeProfBonus": true },
+      "fromBackgrounds": ["criminal"]
+    },
+    {
+      "id": "magic-initiate-cleric",
+      "name": "Magic Initiate (Cleric)",
+      "category": "origin",
+      "variantOf": "magic-initiate",
+      "spellList": "cleric",
+      "plain": "Two cleric cantrips plus one 1st-level cleric spell you can cast free once per long rest. This is how a non-caster gets a little magic.",
+      "benefits": [
+        { "name": "Two Cantrips", "text": "You learn two cantrips of your choice from the Cleric spell list. Intelligence, Wisdom, or Charisma is your spellcasting ability for this feat's spells (choose when you select this feat)." },
+        { "name": "Level 1 Spell", "text": "Choose a level 1 spell from the Cleric list. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have." },
+        { "name": "Spell Change", "text": "Whenever you gain a new level, you can replace one of the spells you chose for this feat with a different spell of the same level from the chosen spell list." }
+      ],
+      "choices": [
+        { "id": "cantrips", "label": "Pick two Cleric cantrips", "grant": { "type": "spell", "list": "cleric", "spellLevel": 0, "count": 2 } },
+        { "id": "spell", "label": "Pick one level 1 Cleric spell", "grant": { "type": "spell", "list": "cleric", "spellLevel": 1, "count": 1, "freeCastPerLongRest": 1 } },
+        { "id": "ability", "label": "Spellcasting ability for these spells", "grant": { "type": "ability", "from": ["int", "wis", "cha"], "count": 1, "purpose": "Magic Initiate spellcasting" } }
+      ],
+      "fromBackgrounds": ["acolyte"]
+    },
+    {
+      "id": "magic-initiate-wizard",
+      "name": "Magic Initiate (Wizard)",
+      "category": "origin",
+      "variantOf": "magic-initiate",
+      "spellList": "wizard",
+      "plain": "Two wizard cantrips plus one 1st-level wizard spell free once per long rest. Fire Bolt plus Shield is a classic pick.",
+      "benefits": [
+        { "name": "Two Cantrips", "text": "You learn two cantrips of your choice from the Wizard spell list. Intelligence, Wisdom, or Charisma is your spellcasting ability for this feat's spells (choose when you select this feat)." },
+        { "name": "Level 1 Spell", "text": "Choose a level 1 spell from the Wizard list. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have." },
+        { "name": "Spell Change", "text": "Whenever you gain a new level, you can replace one of the spells you chose for this feat with a different spell of the same level from the chosen spell list." }
+      ],
+      "choices": [
+        { "id": "cantrips", "label": "Pick two Wizard cantrips", "grant": { "type": "spell", "list": "wizard", "spellLevel": 0, "count": 2 } },
+        { "id": "spell", "label": "Pick one level 1 Wizard spell", "grant": { "type": "spell", "list": "wizard", "spellLevel": 1, "count": 1, "freeCastPerLongRest": 1 } },
+        { "id": "ability", "label": "Spellcasting ability for these spells", "grant": { "type": "ability", "from": ["int", "wis", "cha"], "count": 1, "purpose": "Magic Initiate spellcasting" } }
+      ],
+      "fromBackgrounds": ["sage"]
+    },
+    {
+      "id": "magic-initiate-druid",
+      "name": "Magic Initiate (Druid)",
+      "category": "origin",
+      "variantOf": "magic-initiate",
+      "spellList": "druid",
+      "plain": "Two druid cantrips plus one 1st-level druid spell free once per long rest. Good for nature-flavored characters.",
+      "benefits": [
+        { "name": "Two Cantrips", "text": "You learn two cantrips of your choice from the Druid spell list. Intelligence, Wisdom, or Charisma is your spellcasting ability for this feat's spells (choose when you select this feat)." },
+        { "name": "Level 1 Spell", "text": "Choose a level 1 spell from the Druid list. You always have that spell prepared. You can cast it once without a spell slot, and you regain the ability to cast it in that way when you finish a Long Rest. You can also cast the spell using any spell slots you have." },
+        { "name": "Spell Change", "text": "Whenever you gain a new level, you can replace one of the spells you chose for this feat with a different spell of the same level from the chosen spell list." }
+      ],
+      "choices": [
+        { "id": "cantrips", "label": "Pick two Druid cantrips", "grant": { "type": "spell", "list": "druid", "spellLevel": 0, "count": 2 } },
+        { "id": "spell", "label": "Pick one level 1 Druid spell", "grant": { "type": "spell", "list": "druid", "spellLevel": 1, "count": 1, "freeCastPerLongRest": 1 } },
+        { "id": "ability", "label": "Spellcasting ability for these spells", "grant": { "type": "ability", "from": ["int", "wis", "cha"], "count": 1, "purpose": "Magic Initiate spellcasting" } }
+      ],
+      "fromBackgrounds": []
+    },
+    {
+      "id": "savage-attacker",
+      "name": "Savage Attacker",
+      "category": "origin",
+      "plain": "Once each turn you reroll your weapon's damage dice and keep whichever roll you like better. Pure damage, no decisions to remember.",
+      "benefits": [
+        { "name": "Savage Attacker", "text": "You have trained to deal particularly damaging strikes. Once per turn when you hit a target with a weapon, you can roll the weapon's damage dice twice and use either roll against the target." }
+      ],
+      "fromBackgrounds": ["soldier"]
+    },
+    {
+      "id": "skilled",
+      "name": "Skilled",
+      "category": "origin",
+      "plain": "Three more skill or tool proficiencies. The widest feat in the game, and a great pick if you want your character to be good at a lot of things out of combat.",
+      "benefits": [
+        { "name": "Skilled", "text": "You gain proficiency in any combination of three skills or tools of your choice." },
+        { "name": "Repeatable", "text": "You can take this feat more than once." }
+      ],
+      "choices": [
+        { "id": "profs", "label": "Pick three skills or tools", "grant": { "type": "skillOrTool", "from": "any", "count": 3 } }
+      ],
+      "fromBackgrounds": []
+    },
+    {
+      "id": "archery",
+      "name": "Archery",
+      "category": "fightingStyle",
+      "prerequisite": "Fighting Style feature",
+      "plain": "A flat +2 to hit with any ranged weapon. The single biggest accuracy boost available, and the default pick for a bow user.",
+      "benefits": [{ "name": "Archery", "text": "You gain a +2 bonus to attack rolls you make with Ranged weapons." }],
+      "effects": { "rangedAttackBonus": 2 }
+    },
+    {
+      "id": "defense",
+      "name": "Defense",
+      "category": "fightingStyle",
+      "prerequisite": "Fighting Style feature",
+      "plain": "+1 Armor Class while wearing any armor. Boring and excellent. Pick this if you are unsure.",
+      "benefits": [{ "name": "Defense", "text": "While you are wearing Light, Medium, or Heavy armor, you gain a +1 bonus to Armor Class." }],
+      "effects": { "acBonusWithArmor": 1 }
+    },
+    {
+      "id": "great-weapon-fighting",
+      "name": "Great Weapon Fighting",
+      "category": "fightingStyle",
+      "prerequisite": "Fighting Style feature",
+      "plain": "Rerolls your worst damage dice when swinging a two-handed weapon. Take it if you are using a greatsword, greataxe or maul.",
+      "benefits": [{ "name": "Great Weapon Fighting", "text": "When you roll damage for an attack you make with a Melee weapon that you are holding with two hands, you can treat any 1 or 2 on a damage die as a 3. The weapon must have the Two-Handed or Versatile property to gain this benefit." }]
+    },
+    {
+      "id": "two-weapon-fighting",
+      "name": "Two-Weapon Fighting",
+      "category": "fightingStyle",
+      "prerequisite": "Fighting Style feature",
+      "plain": "Adds your ability modifier to your off-hand attack's damage. Take it if you are fighting with two light weapons.",
+      "benefits": [{ "name": "Two-Weapon Fighting", "text": "When you make an extra attack as a result of using a weapon that has the Light property, you can add your ability modifier to the damage of that attack if you are not already adding it to the damage." }]
+    },
+    {
+      "id": "ability-score-improvement",
+      "name": "Ability Score Improvement",
+      "category": "general",
+      "prerequisite": "Level 4+",
+      "plain": "Raise one ability score by 2 or two scores by 1. The default choice whenever your class offers a feat.",
+      "benefits": [
+        { "name": "Ability Score Improvement", "text": "Increase one ability score of your choice by 2, or increase two ability scores of your choice by 1. This feat cannot increase an ability score above 20." },
+        { "name": "Repeatable", "text": "You can take this feat more than once." }
+      ]
+    },
+    {
+      "id": "grappler",
+      "name": "Grappler",
+      "category": "general",
+      "prerequisite": "Level 4+, Strength or Dexterity 13+",
+      "plain": "Makes grabbing and holding enemies a real tactic. Niche but fun.",
+      "benefits": [
+        { "name": "Ability Score Increase", "text": "Increase your Strength or Dexterity score by 1, to a maximum of 20." },
+        { "name": "Punch and Grab", "text": "When you hit a creature with an Unarmed Strike as part of the Attack action on your turn, you can use both the Damage and the Grapple option. You can use this benefit only once per turn." },
+        { "name": "Attack Advantage", "text": "You have Advantage on attack rolls against a creature Grappled by you." },
+        { "name": "Fast Wrestler", "text": "You do not have to spend extra movement to move a creature Grappled by you if the creature is your size or smaller." }
+      ]
+    }
+  ]
+}

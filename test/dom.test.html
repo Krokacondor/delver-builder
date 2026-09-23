@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>DOM smoke test</title></head>
+<body>
+<pre id="out">running…</pre>
+<div id="sandbox" style="display:none"></div>
+
+<script type="module">
+import { loadData, DATA } from '../js/data.js';
+import { newCharacter, derive, stepIssues } from '../js/rules.js';
+import { STEPS, renderClass, renderSpecies, renderAbilities, renderBackground, renderProficiencies, renderSpells } from '../js/steps.js';
+import { renderSheet } from '../js/sheet.js';
+
+const RENDER = {
+  class: renderClass, species: renderSpecies, abilities: renderAbilities,
+  background: renderBackground, proficiencies: renderProficiencies,
+  spells: renderSpells, sheet: renderSheet
+};
+
+const log = [];
+let pass = 0, fail = 0;
+const ok = (name, cond, detail) => {
+  if (cond) { pass++; log.push(`ok    ${name}`); }
+  else { fail++; log.push(`FAIL  ${name}${detail ? '\n        ' + detail : ''}`); }
+};
+
+// Surface anything the renderers throw asynchronously too.
+const errors = [];
+window.addEventListener('error', e => errors.push(e.message));
+window.addEventListener('unhandledrejection', e => errors.push(String(e.reason)));
+
+const ctx = { update: () => {}, goto: () => {}, silentSave: () => {} };
+
+function renderInto(stepId, char) {
+  const box = document.createElement('div');
+  document.getElementById('sandbox').appendChild(box);
+  RENDER[stepId](box, char, ctx);
+  return box;
+}
+
+/* A representative finished character for each class, so every branch of the
+   renderers (spellbook, pact magic, unarmored defense, expertise…) gets hit. */
+function buildFor(classId) {
+  const cls = DATA.byId.class[classId];
+  const c = newCharacter();
+  c.classId = classId;
+  c.speciesId = 'human';
+  c.speciesChoices = { size: 'Medium', skillful: 'perception', versatile: 'skilled' };
+  c.abilityMethod = 'manual';
+  c.baseAbilities = { str: 15, dex: 14, con: 14, int: 13, wis: 12, cha: 10 };
+  c.backgroundId = 'soldier';
+  c.bgAbility = { mode: '2-1', plus2: cls.primaryAbility[0], plus1: 'con' };
+  c.classSkills = (cls.skills.from === 'any'
+    ? DATA.rules.skills.map(s => s.id)
+    : cls.skills.from).slice(0, cls.skills.count);
+  c.featChoices = { skilled: { profs: ['arcana', 'history', 'medicine'] },
+                    'savage-attacker': {} };
+  c.equipmentChoice = { class: cls.startingEquipment[0].id, background: 'a' };
+  c.classChoices = { bgTool: 'Dice Set' };
+
+  // Satisfy every class feature choice generically.
+  for (const f of [...(cls.features || []), ...(cls.extraFeatures || [])]) {
+    const ch = f.choice; if (!ch) continue;
+    const g = ch.grant, need = g.count || 1;
+    if (ch.options) c.classChoices[ch.id] = ch.options[0].id;
+    else if (g.type === 'feat') c.classChoices[ch.id] = (g.category === 'fightingStyle' ? DATA.fightingStyles : DATA.originFeats)[0].id;
+    else if (g.type === 'weaponMastery') c.classChoices[ch.id] = DATA.equipment.weapons.filter(w => w.range === 'melee').slice(0, need).map(w => w.name);
+    else if (g.type === 'expertise') c.classChoices[ch.id] = c.classSkills.slice(0, need);
+    else if (g.type === 'language') c.classChoices[ch.id] = 'Elvish';
+  }
+  if (cls.toolProficiencies && typeof cls.toolProficiencies === 'object') {
+    const groups = cls.toolProficiencies.from === 'artisanOrInstrument'
+      ? [...DATA.equipment.toolCategories.artisansTools, ...DATA.equipment.toolCategories.musicalInstrument]
+      : DATA.equipment.toolCategories[cls.toolProficiencies.from];
+    c.classChoices.tools = groups.slice(0, cls.toolProficiencies.count);
+  }
+
+  // Spells
+  const sc = cls.spellcasting;
+  if (sc) {
+    const cantrips = (DATA.spells.classLists[sc.list] || [])
+      .map(n => DATA.spellsByName[n]).filter(s => s && s.level === 0);
+    const lvl1 = (DATA.spells.classLists[sc.list] || [])
+      .map(n => DATA.spellsByName[n]).filter(s => s && s.level === 1);
+    const bonusCantrip = (() => {
+      for (const f of cls.features || []) {
+        const opt = (f.choice?.options || []).find(o => o.id === c.classChoices[f.choice?.id]);
+        if (opt?.effects?.bonusCantrips) return opt.effects.bonusCantrips;
+      }
+      return 0;
+    })();
+    c.spells.cantrips = cantrips.slice(0, sc.cantripsKnown + bonusCantrip).map(s => s.id);
+    if (sc.prepareStyle === 'spellbook') {
+      c.spells.spellbook = lvl1.slice(0, sc.spellbookSpells).map(s => s.id);
+      c.spells.prepared = c.spells.spellbook.slice(0, sc.preparedSpells);
+    } else {
+      c.spells.prepared = lvl1.slice(0, sc.preparedSpells).map(s => s.id);
+    }
+  }
+  return c;
+}
+
+async function run() {
+  await loadData();
+  ok('data loaded', !!DATA.classes && DATA.spells.spells.length === 339,
+     `spells=${DATA.spells?.spells?.length}`);
+
+  // Every step renders for an empty character without throwing.
+  for (const s of STEPS) {
+    try {
+      const box = renderInto(s.id, newCharacter());
+      ok(`empty character renders step "${s.id}"`, box.childElementCount > 0);
+    } catch (e) {
+      ok(`empty character renders step "${s.id}"`, false, e.stack || e.message);
+    }
+  }
+
+  // Every class renders every step, fully built.
+  for (const cls of DATA.classes.classes) {
+    const c = buildFor(cls.id);
+
+    const issues = {};
+    for (const s of STEPS) {
+      if (s.id === 'sheet') continue;
+      const i = stepIssues(c, s.id);
+      if (i.length) issues[s.id] = i;
+    }
+    ok(`${cls.name}: test build is complete`, Object.keys(issues).length === 0, JSON.stringify(issues));
+
+    for (const s of STEPS) {
+      try {
+        const box = renderInto(s.id, c);
+        ok(`${cls.name}: step "${s.id}" renders`, box.childElementCount > 0);
+      } catch (e) {
+        ok(`${cls.name}: step "${s.id}" renders`, false, e.stack || e.message);
+      }
+    }
+
+    // The finished sheet must actually contain the sheet, not the "almost there" list.
+    try {
+      const box = renderInto('sheet', c);
+      const hasSheet = !!box.querySelector('.sheet');
+      ok(`${cls.name}: sheet is complete`, hasSheet,
+         hasSheet ? '' : box.textContent.slice(0, 200));
+      if (hasSheet) {
+        const d = derive(c);
+        ok(`${cls.name}: AC is a sane number`, d.ac >= 8 && d.ac <= 21, `ac=${d.ac} (${d.acHow})`);
+        ok(`${cls.name}: HP is a sane number`, d.hp >= 4 && d.hp <= 20, `hp=${d.hp}`);
+        ok(`${cls.name}: sheet lists all 18 skills`,
+           box.querySelectorAll('.skilltable tr').length >= 18);
+      }
+    } catch (e) {
+      ok(`${cls.name}: sheet is complete`, false, e.stack || e.message);
+    }
+  }
+
+  // Every species renders on step 2 with its choices made.
+  for (const sp of DATA.species.species) {
+    const c = newCharacter();
+    c.speciesId = sp.id;
+    if (sp.size.choice) c.speciesChoices.size = sp.size.choice[0];
+    for (const ch of sp.choices || []) {
+      if (ch.options) c.speciesChoices[ch.id] = ch.options[0].id;
+      else if (ch.grant.type === 'skill') c.speciesChoices[ch.id] = (ch.grant.from === 'any' ? ['perception'] : ch.grant.from)[0];
+      else if (ch.grant.type === 'ability') c.speciesChoices[ch.id] = ch.grant.from[0];
+      else if (ch.grant.type === 'originFeat') c.speciesChoices[ch.id] = DATA.originFeats[0].id;
+    }
+    try {
+      renderInto('species', c);
+      ok(`${sp.name}: renders with choices made`, stepIssues(c, 'species').length === 0,
+         JSON.stringify(stepIssues(c, 'species')));
+    } catch (e) {
+      ok(`${sp.name}: renders with choices made`, false, e.stack || e.message);
+    }
+  }
+
+  // All four ability-score methods render.
+  for (const m of ['standard', 'pointbuy', 'roll', 'manual']) {
+    const c = newCharacter();
+    c.classId = 'fighter';
+    c.abilityMethod = m;
+    if (m === 'roll') c.rolledSet = [15, 14, 13, 12, 10, 8];
+    try {
+      const box = renderInto('abilities', c);
+      ok(`ability method "${m}" renders`, box.childElementCount > 0);
+    } catch (e) {
+      ok(`ability method "${m}" renders`, false, e.stack || e.message);
+    }
+  }
+
+  // Custom background flow.
+  try {
+    const c = newCharacter();
+    c.classId = 'fighter';
+    c.backgroundId = 'custom';
+    c.customBg = { abilities: ['str', 'con', 'wis'], feat: 'alert', skills: ['athletics', 'survival'], tool: "Smith's Tools" };
+    c.bgAbility = { mode: '2-1', plus2: 'str', plus1: 'con' };
+    const box = renderInto('background', c);
+    ok('custom background renders', box.childElementCount > 0);
+    ok('custom background validates', stepIssues(c, 'background').length === 0,
+       JSON.stringify(stepIssues(c, 'background')));
+  } catch (e) {
+    ok('custom background renders', false, e.stack || e.message);
+  }
+
+  await new Promise(r => setTimeout(r, 120));
+  ok('no uncaught errors', errors.length === 0, errors.join(' | '));
+
+  const failures = log.filter(l => l.startsWith('FAIL'));
+  document.getElementById('out').textContent =
+    (failures.length ? failures.join('\n') + '\n\n' : '') +
+    `RESULT ${pass} passed, ${fail} failed, ${pass + fail} total`;
+  document.title = fail ? 'FAILED' : 'PASSED';
+}
+
+run().catch(e => {
+  document.getElementById('out').textContent = 'HARNESS CRASH: ' + (e.stack || e.message);
+  document.title = 'FAILED';
+});
+</script>
+</body>
+</html>

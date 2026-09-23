@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Level 1 Character Builder</title>
+<meta name="description" content="A step-by-step D&amp;D 2024 character builder for new players, built on SRD 5.2.1.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#127922;</text></svg>">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand">
+      <span class="brand-die" aria-hidden="true">20</span>
+      <div>
+        <h1>Level 1 Character Builder</h1>
+        <p class="brand-sub">D&amp;D 2024 rules, explained for new players</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button type="button" class="btn ghost" id="btn-theme" title="Switch light/dark" aria-label="Switch light or dark theme">Theme</button>
+      <button type="button" class="btn ghost" id="btn-reference">Reference</button>
+      <button type="button" class="btn ghost danger" id="btn-reset">Start over</button>
+    </div>
+  </div>
+</header>
+
+<nav class="stepper" aria-label="Character building steps">
+  <div class="wrap">
+    <ol id="stepper-list"></ol>
+  </div>
+</nav>
+
+<main id="main" class="wrap">
+  <div id="step-root" aria-live="polite"></div>
+
+  <div class="navrow">
+    <button type="button" class="btn" id="btn-prev">&larr; Back</button>
+    <div class="navrow-status" id="nav-status"></div>
+    <button type="button" class="btn primary" id="btn-next">Next &rarr;</button>
+  </div>
+</main>
+
+<aside id="summary" class="summary" aria-label="Character summary so far">
+  <button type="button" class="summary-toggle" id="summary-toggle" aria-expanded="false">
+    <span id="summary-title">Your character</span>
+    <span class="chev" aria-hidden="true">&#9650;</span>
+  </button>
+  <div class="summary-body" id="summary-body"></div>
+</aside>
+
+<div class="modal-backdrop" id="modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-head">
+      <h2 id="modal-title">Reference</h2>
+      <button type="button" class="btn ghost" id="modal-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="wrap">
+    <p class="attrib">
+      This work includes material from the System Reference Document 5.2.1 (&ldquo;SRD 5.2.1&rdquo;) by Wizards of the
+      Coast LLC, available at <a href="https://www.dndbeyond.com/srd" rel="noopener">https://www.dndbeyond.com/srd</a>.
+      The SRD 5.2.1 is licensed under the Creative Commons Attribution 4.0 International License, available at
+      <a href="https://creativecommons.org/licenses/by/4.0/legalcode" rel="noopener">https://creativecommons.org/licenses/by/4.0/legalcode</a>.
+    </p>
+    <p class="attrib small">
+      Compatible with fifth edition. Plain-language explanations and this tool's code are original work.
+      Not affiliated with Wizards of the Coast.
+    </p>
+  </div>
+</footer>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

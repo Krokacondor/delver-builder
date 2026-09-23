@@ -1,0 +1,13 @@
+node_modules/
+package-lock.json
+
+# Your private Player's Handbook additions. Never published.
+data/extras.json
+
+# Large source + derived artifacts. Re-create with the commands in README.md.
+sources/SRD_CC_v5.2.1.pdf
+sources/srd.txt
+sources/level1features.txt
+
+.DS_Store
+Thumbs.db

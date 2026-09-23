@@ -1,0 +1,100 @@
+{
+  "note": "Background mechanics from SRD 5.2.1 (CC-BY-4.0). All descriptive flavor text is original; the SRD lists mechanics only.",
+  "rules": {
+    "intro": "Your background is what you did before you became an adventurer. In the 2024 rules this is where your ability score bonuses come from, not your species. It also gives you an Origin feat, two skills, a tool, and starting gear.",
+    "parts": [
+      { "name": "Ability Scores", "text": "A background lists three of your character's ability scores. Increase one by 2 and another one by 1, or increase all three by 1. None of these increases can raise a score above 20.", "plain": "You get +3 total, split one of two ways: either +2 and +1, or +1/+1/+1. Most people put the +2 into their class's main ability." },
+      { "name": "Feat", "text": "A background gives your character a specified Origin feat.", "plain": "A free talent. Which one depends on the background." },
+      { "name": "Skill Proficiencies", "text": "A background gives your character proficiency in two specified skills.", "plain": "Two skills, already picked for you." },
+      { "name": "Tool Proficiency", "text": "Each background gives a character proficiency with one tool, either a specific tool or one chosen from the Artisan's Tools category.", "plain": "One set of tools you know how to use." },
+      { "name": "Equipment", "text": "Each background offers a choice between a package of equipment and 50 GP.", "plain": "Take the gear bundle or take 50 gold and shop for yourself. New players should take the bundle." }
+    ],
+    "asiNote": "This is the step where your ability scores actually finish. Whatever you rolled or bought in the last step gets +3 spread across these three abilities."
+  },
+  "srdGapNote": "The SRD includes 4 backgrounds. The 2024 Player's Handbook has 16. The other 12 can be added via data/extras.json, or you can build your own with the Custom Background option, which uses the official rules from the SRD Gameplay Toolbox.",
+  "backgrounds": [
+    {
+      "id": "acolyte",
+      "name": "Acolyte",
+      "tagline": "You served in a temple and learned a little real divine magic.",
+      "plain": "You grew up tending a shrine, copying prayers and assisting at rites. You come out of it with book learning, a read on people, and two cleric cantrips you can actually cast.",
+      "abilities": ["int", "wis", "cha"],
+      "feat": "magic-initiate-cleric",
+      "skills": ["insight", "religion"],
+      "tools": [{ "fixed": "Calligrapher's Supplies" }],
+      "equipment": {
+        "a": { "items": ["Calligrapher's Supplies", "Book (prayers)", "Holy Symbol", "Parchment (10 sheets)", "Robe"], "gp": 8 },
+        "b": { "items": [], "gp": 50 }
+      },
+      "goodFor": ["cleric", "paladin", "warlock", "bard"],
+      "beginnerFriendly": true
+    },
+    {
+      "id": "criminal",
+      "name": "Criminal",
+      "tagline": "You made your living outside the law. You are never caught flat-footed.",
+      "plain": "Pickpocket, burglar, smuggler, lookout. You are quick, quiet, and you notice trouble a half second before everyone else does, which is exactly what the Alert feat represents.",
+      "abilities": ["dex", "con", "int"],
+      "feat": "alert",
+      "skills": ["sleightofhand", "stealth"],
+      "tools": [{ "fixed": "Thieves' Tools" }],
+      "equipment": {
+        "a": { "items": ["2 Daggers", "Thieves' Tools", "Crowbar", "2 Pouches", "Traveler's Clothes"], "gp": 16 },
+        "b": { "items": [], "gp": 50 }
+      },
+      "goodFor": ["rogue", "ranger", "monk", "fighter"],
+      "beginnerFriendly": true
+    },
+    {
+      "id": "sage",
+      "name": "Sage",
+      "tagline": "You studied. Now you know things, including a wizard spell or two.",
+      "plain": "Libraries, laboratories, dusty archives. You are the one who recognizes the rune on the door. Comes with two wizard cantrips and a 1st-level wizard spell.",
+      "abilities": ["con", "int", "wis"],
+      "feat": "magic-initiate-wizard",
+      "skills": ["arcana", "history"],
+      "tools": [{ "fixed": "Calligrapher's Supplies" }],
+      "equipment": {
+        "a": { "items": ["Quarterstaff", "Calligrapher's Supplies", "Book (history)", "Parchment (8 sheets)", "Robe"], "gp": 8 },
+        "b": { "items": [], "gp": 50 }
+      },
+      "goodFor": ["wizard", "artificer", "cleric", "druid"],
+      "beginnerFriendly": true
+    },
+    {
+      "id": "soldier",
+      "name": "Soldier",
+      "tagline": "You served in an army. You hit hard and you look like you mean it.",
+      "plain": "Drill, marches, and real fights. Savage Attacker lets you reroll your damage dice once a turn, so this is the straightforward pick for anyone who plans to swing a weapon.",
+      "abilities": ["str", "dex", "con"],
+      "feat": "savage-attacker",
+      "skills": ["athletics", "intimidation"],
+      "tools": [{ "chooseFrom": "gamingSet", "label": "Choose one kind of Gaming Set" }],
+      "equipment": {
+        "a": { "items": ["Spear", "Shortbow", "20 Arrows", "Gaming Set (same as above)", "Healer's Kit", "Quiver", "Traveler's Clothes"], "gp": 14 },
+        "b": { "items": [], "gp": 50 }
+      },
+      "goodFor": ["fighter", "barbarian", "paladin", "ranger"],
+      "beginnerFriendly": true
+    }
+  ],
+  "custom": {
+    "id": "custom",
+    "name": "Custom Background",
+    "tagline": "Build your own. Official rules, straight from the SRD Gameplay Toolbox.",
+    "plain": "Invent the background you actually want. You pick the three abilities, the Origin feat, the two skills, the tool, and your gear. Check with your DM first, but these are the real rules for it.",
+    "beginnerFriendly": false,
+    "steps": [
+      { "n": 1, "name": "Choose Abilities", "text": "Choose three abilities that seem appropriate for the background.", "guidance": [
+        { "ability": "Strength or Dexterity", "text": "Ideal for a background involving physical exertion." },
+        { "ability": "Constitution", "text": "Ideal for a background that involves endurance or long hours of activity." },
+        { "ability": "Intelligence or Wisdom", "text": "One or both are ideal for a background that focuses on cerebral or spiritual matters." },
+        { "ability": "Charisma", "text": "Ideal for a background that involves performance or social interaction." }
+      ], "grant": { "type": "ability", "from": "any", "count": 3, "distinct": true } },
+      { "n": 2, "name": "Choose a Feat", "text": "Choose one feat from the Origin category.", "grant": { "type": "originFeat", "count": 1 } },
+      { "n": 3, "name": "Choose Skill Proficiencies", "text": "Choose two skills appropriate for the background. There need not be a relationship between the skill proficiencies a background grants and the ability scores it increases.", "grant": { "type": "skill", "from": "any", "count": 2 } },
+      { "n": 4, "name": "Choose a Tool Proficiency", "text": "Choose one tool used in the practice of the background or often associated with it.", "grant": { "type": "tool", "from": "any", "count": 1 } },
+      { "n": 5, "name": "Choose Equipment", "text": "Assemble a package of equipment worth 50 GP (including unspent gold). Do not include Martial weapons or armor, as characters get them from their class choices.", "grant": { "type": "equipmentBudget", "gp": 50, "exclude": ["martial weapons", "armor"] } }
+    ]
+  }
+}
