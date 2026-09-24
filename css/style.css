@@ -395,22 +395,23 @@ label { font-size: .88rem; }
 }
 .bx-v { font-family: var(--font-head); font-weight: 700; text-align: center; line-height: 1; }
 
-/* --- masthead --- */
+/* --- masthead: one compact row, name plus four identity fields --- */
 .cs-head {
-  display: grid; gap: 10px; grid-template-columns: minmax(200px, 1.6fr) 2fr;
-  align-items: stretch; margin-bottom: 10px;
+  display: grid; gap: 6px; margin-bottom: 8px;
+  grid-template-columns: minmax(180px, 2.2fr) repeat(4, minmax(78px, 1fr));
+  align-items: stretch;
 }
-.cs-name { border: 1.5px solid var(--line); border-radius: 5px; padding: 8px 12px; display: flex; flex-direction: column; justify-content: center; }
+.cs-name, .cs-id {
+  border: 1.5px solid var(--line); border-radius: 5px; padding: 4px 9px;
+  display: flex; flex-direction: column; justify-content: center; min-height: 44px;
+}
 .cs-name input {
-  font-family: var(--font-head); font-size: 1.55rem; font-weight: 700;
-  border: 0; background: none; padding: 0; width: 100%; color: var(--ink); line-height: 1.15;
+  font-family: var(--font-head); font-size: 1.25rem; font-weight: 700;
+  border: 0; background: none; padding: 0; width: 100%; color: var(--ink); line-height: 1.2;
 }
 .cs-name input::placeholder { color: var(--text-dim); font-weight: 400; }
-/* Fixed 3x2 so six fields fill both rows evenly instead of leaving a gap. */
-.cs-idgrid { display: grid; gap: 6px; grid-template-columns: repeat(3, 1fr); }
-.cs-id { border: 1.5px solid var(--line); border-radius: 5px; padding: 5px 8px; display: flex; flex-direction: column; justify-content: center; }
-.cs-id .v { font-weight: 700; font-size: .92rem; line-height: 1.2; }
-.cs-id .k { font-size: .6rem; text-transform: uppercase; letter-spacing: .09em; color: var(--text-dim); margin-top: 2px; }
+.cs-name .k, .cs-id .k { font-size: .57rem; text-transform: uppercase; letter-spacing: .09em; color: var(--text-dim); margin-top: 1px; }
+.cs-id .v { font-weight: 700; font-size: .88rem; line-height: 1.2; }
 
 /* --- main three-column body --- */
 .cs-body { display: grid; gap: 10px; grid-template-columns: 196px minmax(0, 1fr); align-items: start; }
@@ -457,7 +458,8 @@ label { font-size: .88rem; }
 }
 
 /* --- hit points --- */
-.cs-hp { display: grid; gap: 8px; grid-template-columns: 2fr 1fr 1.3fr; }
+/* Four boxes: current/max HP, temp HP, hit dice, death saves. */
+.cs-hp { display: grid; gap: 8px; grid-template-columns: 1.5fr 1fr 1fr 1.5fr; }
 .cs-hp .hpmain { display: flex; align-items: baseline; justify-content: center; gap: 4px; }
 .cs-hp input.cur {
   width: 3.2ch; font-family: var(--font-head); font-size: 1.6rem; font-weight: 700;
@@ -525,10 +527,34 @@ label { font-size: .88rem; }
 .cs-extra { display: grid; gap: 10px; margin-top: 10px; }
 .cs-pair { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); align-items: start; }
 
+/* --- adventure log: coins, found items, notes --- */
+.cs-log { display: grid; gap: 10px; margin-top: 10px; }
+.cs-coins { display: grid; gap: 8px; grid-template-columns: repeat(5, 1fr); }
+.cs-coins .bx { padding: 5px 4px; }
+.cs-coins input {
+  width: 100%; text-align: center; border: 0; background: none; padding: 0; color: var(--ink);
+  font-family: var(--font-head); font-size: 1.3rem; font-weight: 700; line-height: 1.1;
+}
+.cs-coins input::placeholder { color: var(--text-dim); font-weight: 400; opacity: .55; }
+
+/* Ruled writing area: lines to hand-write on, and a working textarea on screen.
+   The line spacing and the line-height must match or the rules drift. */
+.cs-ruled {
+  width: 100%; display: block; resize: vertical;
+  border: 0; border-radius: 0; padding: 0; margin: 0;
+  background-color: transparent;
+  background-image: repeating-linear-gradient(
+    to bottom, transparent, transparent 21px, var(--hair) 21px, var(--hair) 22px);
+  font: inherit; font-size: .8rem; line-height: 22px; color: var(--ink);
+  min-height: 132px;
+}
+.cs-ruled:focus { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
 @media (max-width: 760px) {
   .cs-body { grid-template-columns: 1fr; }
-  .cs-head { grid-template-columns: 1fr; }
-  .cs-idgrid { grid-template-columns: repeat(2, 1fr); }
+  .cs-head { grid-template-columns: repeat(2, 1fr); }
+  .cs-name { grid-column: 1 / -1; }
+  .cs-coins { grid-template-columns: repeat(3, 1fr); }
   .cs-abils { grid-template-columns: repeat(3, 1fr); gap: 14px 8px; }
   .cs-hp { grid-template-columns: 1fr 1fr; }
   .cs-cols2 { columns: 1; }
@@ -549,8 +575,14 @@ label { font-size: .88rem; }
      proficiencies and equipment land on a second. */
   .csheet {
     --ink: #000; --line: #000; --hair: #999; --paper: #fff;
+    /* The screen's dim grey is too light to read on paper. */
+    --text-dim: #3f3f3f;
     box-shadow: none; padding: 0; border: 0; font-size: 8.4pt;
   }
+  /* Browsers drop background colours when printing unless told otherwise, which
+     silently emptied every filled proficiency dot, death save pip, spell slot
+     and ruled line. */
+  .csheet, .csheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .csheet .bx, .csheet .cs-sec, .csheet .cs-abil,
   .csheet .cs-name, .csheet .cs-id { border-color: #000; }
   .cs-shield { background: #fff !important; }
@@ -580,6 +612,17 @@ label { font-size: .88rem; }
      not fit under the stat block flows onto page 2 together. Forcing a break
      here produced an extra near-empty page. */
   .cs-extra { margin-top: 6px; }
+
+  /* The log is a write-on page, so it gets one of its own and fills it. */
+  .cs-log { break-before: page; margin-top: 0; }
+  .cs-log .cs-sec { break-inside: avoid; }
+  .cs-ruled {
+    min-height: 0; border: 0; overflow: hidden; resize: none;
+    background-image: repeating-linear-gradient(
+      to bottom, transparent, transparent 23px, #999 23px, #999 24px);
+    line-height: 24px; font-size: 9pt; height: 432px;
+  }
+  .cs-coins input { font-size: 1.1rem; }
 
   /* Dashed play fields read as blanks to write in on paper. */
   .cs-hp input.cur, .cs-hp input.temp { border-bottom: 1px solid #000; }

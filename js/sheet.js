@@ -48,7 +48,8 @@ export function renderSheet(root, char, ctx) {
   }
 
   const d = derive(char);
-  char.play ||= { currentHp: null, tempHp: '', deathSuccess: 0, deathFail: 0, slotsUsed: 0, inspiration: false };
+  char.play ||= {};
+  char.play.coins ||= { cp: '', sp: '', ep: '', gp: '', pp: '' };
   const play = char.play;
   const saveQuiet = () => ctx.silentSave?.();
 
@@ -92,16 +93,15 @@ export function renderSheet(root, char, ctx) {
   const idField = (k, v) => el('div', { class: 'cs-id' },
     el('div', { class: 'v', text: v }), el('div', { class: 'k', text: k }));
 
+  // One compact row. Speed and Hit Dice moved to the combat and hit point
+  // rows, where they are actually used, rather than padding the masthead out.
   cs.appendChild(el('div', { class: 'cs-head' },
     el('div', { class: 'cs-name' }, nameInput,
-      el('div', { class: 'k', style: 'font-size:.6rem;text-transform:uppercase;letter-spacing:.09em;color:var(--text-dim);margin-top:3px', text: 'Character name' })),
-    el('div', { class: 'cs-idgrid' },
-      idField('Class & Level', `${d.cls.name} 1`),
-      idField('Species', d.sp.name),
-      idField('Background', d.bg.name),
-      idField('Size', d.size),
-      idField('Speed', `${d.speed} ft`),
-      idField('Hit Dice', d.hitDie))
+      el('div', { class: 'k', text: 'Character name' })),
+    idField('Class & Level', `${d.cls.name} 1`),
+    idField('Species', d.sp.name),
+    idField('Background', d.bg.name),
+    idField('Size', d.size)
   ));
 
   /* ---------------- body: abilities | everything else ---------------- */
@@ -166,17 +166,15 @@ export function renderSheet(root, char, ctx) {
 
   /* --- hit points --- */
   const hpMax = d.hp;
-  const curVal = play.currentHp == null ? hpMax : play.currentHp;
+  // Both hit point fields start blank. They are the boxes a player writes in
+  // and erases during play, so the sheet must not pre-fill them.
   const curInput = el('input', {
-    type: 'number', class: 'cur', id: 'cs-curhp', value: String(curVal), min: '0', max: String(hpMax),
+    type: 'number', class: 'cur', id: 'cs-curhp', value: play.currentHp ?? '', min: '0',
     'aria-label': 'Current hit points',
-    onInput: e => {
-      const v = e.target.value === '' ? null : Math.max(0, Math.min(hpMax, Number(e.target.value)));
-      play.currentHp = v; saveQuiet();
-    }
+    onInput: e => { play.currentHp = e.target.value; saveQuiet(); }
   });
   const tempInput = el('input', {
-    type: 'number', class: 'temp', id: 'cs-temphp', value: play.tempHp ?? '', min: '0', placeholder: '0',
+    type: 'number', class: 'temp', id: 'cs-temphp', value: play.tempHp ?? '', min: '0',
     'aria-label': 'Temporary hit points',
     onInput: e => { play.tempHp = e.target.value; saveQuiet(); }
   });
@@ -201,10 +199,14 @@ export function renderSheet(root, char, ctx) {
     el('div', { class: 'bx' },
       el('div', { class: 'hpmain' }, curInput, el('span', { class: 'max', text: `/ ${hpMax}` })),
       el('div', { class: 'bx-t', text: 'Hit Points' }),
-      el('div', { class: 'bx-t', style: 'font-size:.56rem;opacity:.8', text: `${d.hitDie} ${fmt(d.mods.con)} CON` })),
+      el('div', { class: 'bx-t', style: 'font-size:.56rem;opacity:.8', text: `max ${hpMax}` })),
     el('div', { class: 'bx' },
       tempInput,
       el('div', { class: 'bx-t', text: 'Temp HP' })),
+    el('div', { class: 'bx' },
+      el('div', { class: 'bx-v', style: 'font-size:1.25rem', text: d.hitDie }),
+      el('div', { class: 'bx-t', text: 'Hit Dice' }),
+      el('div', { class: 'bx-t', style: 'font-size:.56rem;opacity:.8', text: `spend on a short rest` })),
     el('div', { class: 'bx' },
       el('div', { class: 'cs-deaths' },
         deathRow('succ', play.deathSuccess || 0, 3, 'Successes'),
@@ -381,6 +383,54 @@ export function renderSheet(root, char, ctx) {
   body.appendChild(rightCol);
   cs.appendChild(body);
   cs.appendChild(extra);
+
+  /* ---------------- adventure log: room to write ----------------
+     Starting gear is printed above and never changes. This page is for
+     everything picked up afterwards, so it is deliberately mostly blank:
+     ruled space to write in on paper, and textareas that save on screen. */
+  const log = el('div', { class: 'cs-log' });
+
+  const coinRow = el('div', { class: 'cs-coins' });
+  for (const [key, label] of [['cp', 'Copper'], ['sp', 'Silver'], ['ep', 'Electrum'], ['gp', 'Gold'], ['pp', 'Platinum']]) {
+    const input = el('input', {
+      type: 'number', min: '0', id: `cs-coin-${key}`,
+      value: play.coins[key] ?? '',
+      placeholder: key === 'gp' && d.gp ? String(d.gp) : '',
+      'aria-label': `${label} pieces`,
+      onInput: e => { play.coins[key] = e.target.value; saveQuiet(); }
+    });
+    coinRow.appendChild(el('div', { class: 'bx' }, input,
+      el('div', { class: 'bx-t', text: label }),
+      el('div', { class: 'bx-t', style: 'font-size:.55rem;opacity:.75', text: key.toUpperCase() })));
+  }
+
+  const ruled = (id, value, rows, label, onInput) => {
+    const ta = el('textarea', {
+      id, rows: String(rows), class: 'cs-ruled', spellcheck: 'false',
+      'aria-label': label, onInput
+    });
+    ta.value = value || '';
+    return ta;
+  };
+
+  const coinSec = el('div', { class: 'cs-sec' }, el('h3', { text: 'Coins' }), coinRow);
+  coinSec.appendChild(el('p', { class: 'cs-inline', style: 'margin-top:6px;color:var(--text-dim);font-size:.68rem',
+    text: d.gp ? `You started with ${d.gp} GP. Write your running total here.` : 'Write your running total here.' }));
+
+  const itemSec = el('div', { class: 'cs-sec' },
+    el('h3', { text: 'Items Found on the Journey' }),
+    ruled('cs-founditems', play.foundItems, 16, 'Items found during play',
+      e => { play.foundItems = e.target.value; saveQuiet(); }));
+
+  const noteSec = el('div', { class: 'cs-sec' },
+    el('h3', { text: 'Notes, Allies & Quests' }),
+    ruled('cs-notes', play.notes, 16, 'Notes',
+      e => { play.notes = e.target.value; saveQuiet(); }));
+
+  log.appendChild(coinSec);
+  log.appendChild(el('div', { class: 'cs-pair' }, itemSec, noteSec));
+  cs.appendChild(log);
+
   root.appendChild(cs);
 
   /* ---------------- guidance below the sheet ---------------- */

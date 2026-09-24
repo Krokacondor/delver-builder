@@ -29,8 +29,13 @@ export function newCharacter() {
     equipmentChoice: { class: null, background: 'a' },
     spells: { cantrips: [], prepared: [], spellbook: [] },
     // State that changes during play rather than during character creation.
-    // currentHp null means "full"; it is resolved against max when rendered.
-    play: { currentHp: null, tempHp: '', deathSuccess: 0, deathFail: 0, slotsUsed: 0, inspiration: false },
+    // Hit point fields start blank on purpose: on a printed sheet they are
+    // boxes the player writes and erases, so nothing is filled in for them.
+    play: {
+      currentHp: '', tempHp: '', deathSuccess: 0, deathFail: 0, slotsUsed: 0,
+      inspiration: false, foundItems: '', notes: '',
+      coins: { cp: '', sp: '', ep: '', gp: '', pp: '' }
+    },
     notes: ''
   };
 }
@@ -52,7 +57,11 @@ export function load() {
     // Merge nested defaults too, so a character saved before a field existed
     // still loads with that field present.
     const base = newCharacter();
-    return { ...base, ...c, play: { ...base.play, ...(c.play || {}) }, spells: { ...base.spells, ...(c.spells || {}) } };
+    return {
+      ...base, ...c,
+      play: { ...base.play, ...(c.play || {}), coins: { ...base.play.coins, ...((c.play || {}).coins || {}) } },
+      spells: { ...base.spells, ...(c.spells || {}) }
+    };
   } catch { return null; }
 }
 export function clearSaved() {
