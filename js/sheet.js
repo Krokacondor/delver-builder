@@ -1,7 +1,13 @@
-/* Step 7: the finished level 1 character sheet. */
+/* Step 7: the finished level 1 character sheet, laid out the way a tabletop
+   sheet is: ruled boxes, ability scores down the left, combat across the top
+   of the right column, features and spells below.
+
+   Everything is derived from the character. The handful of fields that change
+   during play (current HP, temporary HP, death saves, spent spell slots) are
+   editable and stored on char.play. */
 
 import { DATA } from './data.js';
-import { el, pill, notice } from './ui.js';
+import { el, notice } from './ui.js';
 import { ABILS, fmt, derive, stepIssues } from './rules.js';
 import { STEPS } from './steps.js';
 
@@ -42,10 +48,11 @@ export function renderSheet(root, char, ctx) {
   }
 
   const d = derive(char);
+  char.play ||= { currentHp: null, tempHp: '', deathSuccess: 0, deathFail: 0, slotsUsed: 0, inspiration: false };
+  const play = char.play;
+  const saveQuiet = () => ctx.silentSave?.();
 
-  // Inside an embedded viewer (a published artifact) the frame refuses
-  // window.print() and blocks downloads the page starts itself, so offer
-  // copy-and-paste instead of buttons that would silently do nothing.
+  /* ---------------- action bar ---------------- */
   const actions = el('div', { class: 'sheet-actions' });
   if (!EMBEDDED) {
     actions.appendChild(el('button', { type: 'button', class: 'btn primary', text: 'Print / Save as PDF', onClick: () => window.print() }));
@@ -74,239 +81,314 @@ export function renderSheet(root, char, ctx) {
     }));
   }
 
-  const sheet = el('div', { class: 'sheet' });
+  const cs = el('div', { class: 'csheet' });
 
-  /* --- name + header --- */
+  /* ---------------- masthead ---------------- */
   const nameInput = el('input', {
-    type: 'text', value: char.name, placeholder: 'Name your character…',
-    style: 'font-size:1.6rem;font-family:var(--font-head);font-weight:700;border:0;border-bottom:2px dashed var(--border);border-radius:0;padding:2px 0;background:none',
-    onInput: e => { char.name = e.target.value; ctx.silentSave(); }
+    type: 'text', id: 'cs-charname', value: char.name,
+    placeholder: 'Character name', 'aria-label': 'Character name',
+    onInput: e => { char.name = e.target.value; saveQuiet(); }
   });
-  sheet.appendChild(el('div', { class: 'sheet-head' },
-    el('div', { style: 'flex:1;min-width:240px' },
-      nameInput,
-      el('p', { class: 'sub', text: `Level 1 ${d.sp.name} ${d.cls.name}  ·  ${d.bg.name}` })),
-    el('div', {},
-      pill(`${d.size}`, 'info'), ' ',
-      pill(`Speed ${d.speed} ft`, 'info'), ' ',
-      d.darkvision ? pill(`Darkvision ${d.darkvision} ft`, 'info') : null)
+  const idField = (k, v) => el('div', { class: 'cs-id' },
+    el('div', { class: 'v', text: v }), el('div', { class: 'k', text: k }));
+
+  cs.appendChild(el('div', { class: 'cs-head' },
+    el('div', { class: 'cs-name' }, nameInput,
+      el('div', { class: 'k', style: 'font-size:.6rem;text-transform:uppercase;letter-spacing:.09em;color:var(--text-dim);margin-top:3px', text: 'Character name' })),
+    el('div', { class: 'cs-idgrid' },
+      idField('Class & Level', `${d.cls.name} 1`),
+      idField('Species', d.sp.name),
+      idField('Background', d.bg.name),
+      idField('Size', d.size),
+      idField('Speed', `${d.speed} ft`),
+      idField('Hit Dice', d.hitDie))
   ));
 
-  /* --- core stats --- */
-  const stats = el('div', { class: 'statline' });
-  const stat = (k, v, x) => stats.appendChild(el('div', { class: 'statbox' },
-    el('div', { class: 'k', text: k }), el('div', { class: 'v', text: v }), x ? el('div', { class: 'x', text: x }) : null));
-  stat('Armor Class', String(d.ac), d.acHow);
-  stat('Hit Points', String(d.hp), `${d.hitDie} ${fmt(d.mods.con)} CON`);
-  stat('Initiative', fmt(d.initiative), d.initiative !== d.mods.dex ? 'includes Alert' : 'DEX');
-  stat('Proficiency', fmt(d.pb), 'add when trained');
-  stat('Hit Dice', d.hitDie, 'spend on a short rest');
-  stat('Passive Perception', String(d.passivePerception), 'what you notice');
-  sheet.appendChild(stats);
+  /* ---------------- body: abilities | everything else ---------------- */
+  const body = el('div', { class: 'cs-body' });
+  const leftCol = el('div');
+  const rightCol = el('div', { class: 'cs-right' });
 
-  /* --- abilities --- */
-  const ag = el('div', { class: 'abilgrid' });
+  /* --- ability score boxes --- */
+  const abils = el('div', { class: 'cs-abils' });
   for (const a of ABILS) {
-    ag.appendChild(el('div', { class: 'abilbox' },
-      el('div', { class: 'k', text: DATA.byId.ability[a].short }),
+    abils.appendChild(el('div', { class: 'cs-abil' },
+      el('div', { class: 'k', text: DATA.byId.ability[a].name }),
       el('div', { class: 'm', text: fmt(d.mods[a]) }),
       el('div', { class: 's', text: String(d.abilities[a]) })));
   }
-  sheet.appendChild(ag);
-
-  const cols = el('div', { class: 'sheet-cols' });
-  const left = el('div');
-  const right = el('div');
+  leftCol.appendChild(abils);
 
   /* --- saving throws --- */
-  const saveSec = section('Saving Throws');
-  const stbl = el('table', { class: 'skilltable' });
+  const saveSec = el('div', { class: 'cs-sec', style: 'margin-top:10px' },
+    el('h3', { text: 'Saving Throws' }));
+  const saveList = el('ul', { class: 'cs-list' });
   for (const s of d.saves) {
-    stbl.appendChild(el('tr', { class: s.proficient ? 'trained' : '' },
-      el('td', { class: 'prof', text: s.proficient ? '●' : '' }),
-      el('td', { text: s.name }),
-      el('td', { class: 'mod', text: fmt(s.mod) })));
+    saveList.appendChild(el('li', {},
+      el('span', { class: `dot${s.proficient ? ' on' : ''}`, 'aria-hidden': 'true' }),
+      el('span', { class: 'nm', text: s.name }),
+      el('span', { class: 'mod', text: fmt(s.mod) })));
   }
-  saveSec.appendChild(stbl);
-  saveSec.appendChild(el('p', { class: 'muted', style: 'font-size:.8rem;margin-top:6px',
-    text: 'Filled dots are the two your class trains. Roll d20 and add the number.' }));
-  left.appendChild(saveSec);
+  saveSec.appendChild(saveList);
+  leftCol.appendChild(saveSec);
 
   /* --- skills --- */
-  const skSec = section('Skills');
-  const sk = el('table', { class: 'skilltable' });
+  const skillSec = el('div', { class: 'cs-sec', style: 'margin-top:10px' },
+    el('h3', { text: 'Skills' }));
+  const skillList = el('ul', { class: 'cs-list', id: 'cs-skills' });
   for (const s of d.skills) {
-    sk.appendChild(el('tr', { class: s.proficient ? 'trained' : '' },
-      el('td', { class: 'prof', text: s.expertise ? '◉' : s.proficient ? '●' : '' }),
-      el('td', {}, s.name, el('span', { class: 'muted', text: ` (${DATA.byId.ability[s.ability].short})` }),
-        s.sources.length ? el('span', { class: 'muted', style: 'font-size:.75rem', text: ` · ${s.sources.join(', ')}` }) : null),
-      el('td', { class: 'mod', text: fmt(s.mod) })));
+    const cls = s.expertise ? 'dot on exp' : s.proficient ? 'dot on' : 'dot';
+    skillList.appendChild(el('li', { title: s.sources.length ? `From ${s.sources.join(', ')}` : '' },
+      el('span', { class: cls, 'aria-hidden': 'true' }),
+      el('span', { class: 'nm', text: s.name }),
+      el('span', { class: 'ab', text: DATA.byId.ability[s.ability].short }),
+      el('span', { class: 'mod', text: fmt(s.mod) })));
   }
-  skSec.appendChild(sk);
-  if (d.skills.some(s => s.expertise)) {
-    skSec.appendChild(el('p', { class: 'muted', style: 'font-size:.8rem;margin-top:6px', text: '◉ means Expertise: double proficiency bonus.' }));
-  }
-  left.appendChild(skSec);
+  skillSec.appendChild(skillList);
+  skillSec.appendChild(el('p', { class: 'cs-inline', style: 'margin-top:6px;color:var(--text-dim);font-size:.68rem',
+    text: 'Filled dot = proficient. Red dot = expertise (double bonus).' }));
+  leftCol.appendChild(skillSec);
+
+  /* --- combat row --- */
+  const stat = (label, value, sub, extraClass) => el('div', { class: `bx${extraClass ? ' ' + extraClass : ''}` },
+    el('div', { class: 'bx-v', text: value }),
+    el('div', { class: 'bx-t', text: label }),
+    sub ? el('div', { class: 'bx-t', style: 'font-size:.56rem;opacity:.8', text: sub }) : null);
+
+  rightCol.appendChild(el('div', { class: 'cs-combat' },
+    stat('Armor Class', String(d.ac), null, 'cs-shield'),
+    stat('Initiative', fmt(d.initiative)),
+    stat('Speed', `${d.speed}`, 'feet'),
+    stat('Proficiency', fmt(d.pb)),
+    stat('Passive Perception', String(d.passivePerception)),
+    d.spellcasting ? stat('Spell Save DC', String(d.spellcasting.saveDC)) : stat('Size', d.size)
+  ));
+
+  /* --- hit points --- */
+  const hpMax = d.hp;
+  const curVal = play.currentHp == null ? hpMax : play.currentHp;
+  const curInput = el('input', {
+    type: 'number', class: 'cur', id: 'cs-curhp', value: String(curVal), min: '0', max: String(hpMax),
+    'aria-label': 'Current hit points',
+    onInput: e => {
+      const v = e.target.value === '' ? null : Math.max(0, Math.min(hpMax, Number(e.target.value)));
+      play.currentHp = v; saveQuiet();
+    }
+  });
+  const tempInput = el('input', {
+    type: 'number', class: 'temp', id: 'cs-temphp', value: play.tempHp ?? '', min: '0', placeholder: '0',
+    'aria-label': 'Temporary hit points',
+    onInput: e => { play.tempHp = e.target.value; saveQuiet(); }
+  });
+
+  const deathRow = (kind, count, max, label) => {
+    const row = el('div', { class: `row ${kind}` }, el('span', { text: label }));
+    for (let i = 1; i <= max; i++) {
+      row.appendChild(el('button', {
+        type: 'button', class: `pip${i <= count ? ' on' : ''}`,
+        'aria-label': `${label} ${i}`, 'aria-pressed': i <= count ? 'true' : 'false',
+        onClick: () => {
+          const key = kind === 'succ' ? 'deathSuccess' : 'deathFail';
+          play[key] = play[key] === i ? i - 1 : i;
+          ctx.update();
+        }
+      }));
+    }
+    return row;
+  };
+
+  rightCol.appendChild(el('div', { class: 'cs-hp' },
+    el('div', { class: 'bx' },
+      el('div', { class: 'hpmain' }, curInput, el('span', { class: 'max', text: `/ ${hpMax}` })),
+      el('div', { class: 'bx-t', text: 'Hit Points' }),
+      el('div', { class: 'bx-t', style: 'font-size:.56rem;opacity:.8', text: `${d.hitDie} ${fmt(d.mods.con)} CON` })),
+    el('div', { class: 'bx' },
+      tempInput,
+      el('div', { class: 'bx-t', text: 'Temp HP' })),
+    el('div', { class: 'bx' },
+      el('div', { class: 'cs-deaths' },
+        deathRow('succ', play.deathSuccess || 0, 3, 'Successes'),
+        deathRow('fail', play.deathFail || 0, 3, 'Failures')),
+      el('div', { class: 'bx-t', style: 'margin-top:6px', text: 'Death Saves' }))
+  ));
 
   /* --- attacks --- */
   if (d.attacks.length) {
-    const atk = section('Attacks');
-    const t = el('table', { class: 'skilltable' });
+    const sec = el('div', { class: 'cs-sec' }, el('h3', { text: 'Attacks' }));
+    const noteFor = a => (a.mastery ? a.mastery.name : a.properties.slice(0, 2).join(', '));
+    // Only show the Notes column when at least one weapon has something to say.
+    const anyNotes = d.attacks.some(a => noteFor(a));
+    const t = el('table', { class: 'cs-tbl' });
     t.appendChild(el('tr', {},
-      el('td', {}, el('b', { text: 'Weapon' })),
-      el('td', { class: 'mod' }, el('b', { text: 'Hit' })),
-      el('td', {}, el('b', { text: 'Damage' }))));
+      el('th', { text: 'Weapon' }), el('th', { class: 'num', text: 'Hit' }),
+      el('th', { text: 'Damage' }), anyNotes ? el('th', { text: 'Notes' }) : null));
     for (const a of d.attacks) {
       t.appendChild(el('tr', {},
-        el('td', {}, a.name,
-          a.mastery ? el('span', { class: 'muted', style: 'font-size:.75rem', text: ` · ${a.mastery.name}` }) : null),
-        el('td', { class: 'mod', text: fmt(a.atk) }),
-        el('td', { text: `${a.damage} ${a.damageType}` })));
+        el('td', { class: 'nm', text: a.name }),
+        el('td', { class: 'num', text: fmt(a.atk) }),
+        el('td', { text: `${a.damage} ${a.damageType}` }),
+        anyNotes ? el('td', { class: 'tag', text: noteFor(a) }) : null));
     }
-    atk.appendChild(t);
-    atk.appendChild(el('p', { class: 'muted', style: 'font-size:.8rem;margin-top:6px',
-      text: 'Roll d20 + Hit against the target’s AC. If you meet or beat it, roll the damage.' }));
-    left.appendChild(atk);
-  }
-
-  /* --- weapon mastery --- */
-  if (d.masteries.length) {
-    const ms = section('Weapon Mastery');
-    for (const m of d.masteries) {
-      ms.appendChild(el('div', { class: 'featureblock' },
-        el('h4', { text: `${m.weapon}: ${m.mastery.name}` }),
-        el('p', { text: m.mastery.plain })));
-    }
-    left.appendChild(ms);
+    sec.appendChild(t);
+    sec.appendChild(el('p', { class: 'cs-inline', style: 'margin-top:6px;color:var(--text-dim);font-size:.7rem',
+      text: "Roll d20 + Hit against the target's AC. Meet or beat it, then roll damage." }));
+    rightCol.appendChild(sec);
   }
 
   /* --- spellcasting --- */
-  if (d.spellcasting || d.bonusSpells.length) {
-    const sp = section('Spellcasting');
-    if (d.spellcasting) {
-      const sc = d.spellcasting;
-      sp.appendChild(el('p', {},
-        el('b', { text: `${sc.abilityName}  ·  ` }),
-        `Save DC ${sc.saveDC}  ·  Attack ${fmt(sc.attackBonus)}  ·  `,
-        el('b', { text: `${sc.slots['1']} level 1 slot${sc.slots['1'] > 1 ? 's' : ''}` }),
-        ` (back on ${sc.slotRecharge || 'a Long Rest'})`));
+  if (d.spellcasting) {
+    const sc = d.spellcasting;
+    const sec = el('div', { class: 'cs-sec tall' }, el('h3', { text: 'Spellcasting' }));
 
-      if (char.spells.cantrips.length) {
-        sp.appendChild(el('p', {}, el('b', { text: 'Cantrips (unlimited): ' }),
-          char.spells.cantrips.map(id => DATA.byId.spell[id]?.name).filter(Boolean).join(', ')));
-      }
-      if (char.spells.prepared.length) {
-        sp.appendChild(el('p', {}, el('b', { text: 'Prepared: ' }),
-          char.spells.prepared.map(id => DATA.byId.spell[id]?.name).filter(Boolean).join(', ')));
-      }
-      if (char.spells.spellbook.length) {
-        const unprepped = char.spells.spellbook.filter(id => !char.spells.prepared.includes(id));
-        if (unprepped.length) {
-          sp.appendChild(el('p', { class: 'muted' }, el('b', { text: 'Also in your spellbook: ' }),
-            unprepped.map(id => DATA.byId.spell[id]?.name).filter(Boolean).join(', ')));
-        }
-      }
+    sec.appendChild(el('p', { class: 'cs-inline' },
+      el('b', { text: sc.abilityName }), ' · Save DC ', el('b', { text: String(sc.saveDC) }),
+      ' · Attack ', el('b', { text: fmt(sc.attackBonus) }), ' · Focus: ', sc.focus));
+
+    // Spell slot pips, clickable so a player can track what they have spent.
+    const total = sc.slots['1'];
+    const used = Math.min(play.slotsUsed || 0, total);
+    const pips = el('div', { class: 'cs-slots' });
+    for (let i = 1; i <= total; i++) {
+      pips.appendChild(el('button', {
+        type: 'button', class: `cs-slot${i <= used ? ' on' : ''}`,
+        'aria-label': `Level 1 spell slot ${i}`, 'aria-pressed': i <= used ? 'true' : 'false',
+        onClick: () => { play.slotsUsed = used === i ? i - 1 : i; ctx.update(); }
+      }));
+    }
+    sec.appendChild(el('div', { class: 'cs-inline', style: 'display:flex;align-items:center;gap:8px;margin-top:6px' },
+      el('b', { text: `Level 1 slots (${total}):` }), pips,
+      el('span', { style: 'color:var(--text-dim);font-size:.7rem', text: `back on ${sc.slotRecharge || 'a Long Rest'}` })));
+
+    const spellRow = (labelText, ids) => {
+      if (!ids.length) return null;
+      const names = ids.map(id => DATA.byId.spell[id]?.name).filter(Boolean).join(', ');
+      return el('p', { class: 'cs-inline' }, el('b', { text: labelText + ': ' }), names);
+    };
+    const cantripRow = spellRow('Cantrips (at will)', char.spells.cantrips);
+    if (cantripRow) sec.appendChild(cantripRow);
+    const prepRow = spellRow('Prepared', char.spells.prepared);
+    if (prepRow) sec.appendChild(prepRow);
+    if (char.spells.spellbook.length) {
+      const unprepped = char.spells.spellbook.filter(id => !char.spells.prepared.includes(id));
+      const bookRow = spellRow('Also in spellbook', unprepped);
+      if (bookRow) sec.appendChild(bookRow);
     }
     for (const b of d.bonusSpells) {
-      sp.appendChild(el('p', { class: 'muted', style: 'font-size:.85rem' },
-        el('b', { text: b.spell.name }), ` — ${b.kind === 'cantrip' ? 'at will' : b.kind === 'always' ? 'always prepared' : 'free once per Long Rest'} (${b.source})`));
+      sec.appendChild(el('p', { class: 'cs-inline', style: 'color:var(--text-dim)' },
+        el('b', { text: b.spell.name }),
+        ` — ${b.kind === 'cantrip' ? 'at will' : b.kind === 'always' ? 'always prepared' : 'free once per Long Rest'} (${b.source})`));
     }
-    right.appendChild(sp);
-
-    // Full text of every spell, so the sheet works away from a book.
-    const chosen = [...char.spells.cantrips, ...char.spells.prepared]
-      .map(id => DATA.byId.spell[id]).filter(Boolean)
-      .concat(d.bonusSpells.map(b => b.spell));
-    const seen = new Set();
-    const uniq = chosen.filter(s => !seen.has(s.id) && seen.add(s.id))
-      .sort((a, b) => a.level - b.level || a.name.localeCompare(b.name));
-    if (uniq.length) {
-      const det = section('Your spells in full');
-      for (const s of uniq) {
-        det.appendChild(el('div', { class: 'featureblock' },
-          el('h4', {}, s.name, ' ', pill(s.level === 0 ? 'Cantrip' : `Level ${s.level}`)),
-          el('p', { style: 'font-size:.78rem', text: `${s.castingTime} · ${s.range} · ${s.components} · ${s.duration}` }),
-          el('p', { text: s.description }),
-          s.higherLevel ? el('p', { style: 'font-size:.8rem', text: `Higher level: ${s.higherLevel}` }) : null));
-      }
-      right.appendChild(det);
+    rightCol.appendChild(sec);
+  } else if (d.bonusSpells.length) {
+    const sec = el('div', { class: 'cs-sec' }, el('h3', { text: 'Magic' }));
+    for (const b of d.bonusSpells) {
+      sec.appendChild(el('p', { class: 'cs-inline' },
+        el('b', { text: b.spell.name }),
+        ` — ${b.kind === 'cantrip' ? 'at will' : b.kind === 'always' ? 'always prepared' : 'free once per Long Rest'} (${b.source})`));
     }
+    rightCol.appendChild(sec);
   }
 
-  /* --- features --- */
-  const fs = section('Class & Species Features');
+  /* --- features & traits --- */
+  const featSec = el('div', { class: 'cs-sec tall' }, el('h3', { text: 'Features & Traits' }));
+  const featWrap = el('div', { class: 'cs-cols2' });
+
   for (const f of [...(d.cls.features || []), ...(d.cls.extraFeatures || [])]) {
     let extra = '';
     const chosenId = f.choice ? char.classChoices[f.choice.id] : null;
     if (chosenId && f.choice?.options) {
       const o = f.choice.options.find(x => x.id === chosenId);
-      if (o) extra = ` — ${o.name}`;
+      if (o) extra = `: ${o.name}`;
     } else if (Array.isArray(chosenId) && chosenId.length) {
-      extra = ` — ${chosenId.join(', ')}`;
+      extra = `: ${chosenId.join(', ')}`;
     } else if (chosenId && DATA.byId.feat[chosenId]) {
-      extra = ` — ${DATA.byId.feat[chosenId].name}`;
+      extra = `: ${DATA.byId.feat[chosenId].name}`;
     }
-    fs.appendChild(el('div', { class: 'featureblock' },
-      el('h4', { text: f.name + extra }),
+    featWrap.appendChild(el('div', { class: 'cs-feat' },
+      el('h4', {}, f.name + extra, el('span', { class: 'from', text: ` · ${d.cls.name}` })),
       el('p', { text: f.plain })));
   }
   for (const t of d.sp.traits) {
-    fs.appendChild(el('div', { class: 'featureblock' },
-      el('h4', { text: `${t.name} (${d.sp.name})` }),
+    featWrap.appendChild(el('div', { class: 'cs-feat' },
+      el('h4', {}, t.name, el('span', { class: 'from', text: ` · ${d.sp.name}` })),
       el('p', { text: t.plain })));
   }
-  right.appendChild(fs);
+  for (const { feat, source } of d.feats) {
+    featWrap.appendChild(el('div', { class: 'cs-feat' },
+      el('h4', {}, feat.name, el('span', { class: 'from', text: ` · feat from ${source}` })),
+      el('p', { text: feat.plain })));
+  }
+  featSec.appendChild(featWrap);
 
-  /* --- feats --- */
-  if (d.feats.length) {
-    const ft = section('Feats');
-    for (const { feat, source } of d.feats) {
-      ft.appendChild(el('div', { class: 'featureblock' },
-        el('h4', {}, feat.name, ' ', pill(`from ${source}`)),
-        el('p', { text: feat.plain })));
+  // Features, proficiencies and equipment go in a full-width block below the
+  // stat block, which both reads better on screen and gives print a clean
+  // second page instead of splitting the two columns mid-flow.
+  const extra = el('div', { class: 'cs-extra' });
+  extra.appendChild(featSec);
+
+  /* --- weapon mastery --- */
+  if (d.masteries.length) {
+    const sec = el('div', { class: 'cs-sec' }, el('h3', { text: 'Weapon Mastery' }));
+    for (const m of d.masteries) {
+      sec.appendChild(el('div', { class: 'cs-feat' },
+        el('h4', { text: `${m.weapon}: ${m.mastery.name}` }),
+        el('p', { text: m.mastery.plain })));
     }
-    right.appendChild(ft);
+    extra.appendChild(sec);
   }
 
-  /* --- proficiencies --- */
-  const pr = section('Other Proficiencies');
-  pr.appendChild(el('p', {}, el('b', { text: 'Armor: ' }), d.cls.armorTraining));
-  pr.appendChild(el('p', {}, el('b', { text: 'Weapons: ' }), d.cls.weaponProficiencies));
-  if (d.tools.length) pr.appendChild(el('p', {}, el('b', { text: 'Tools: ' }), d.tools.map(t => `${t.name} (${t.source})`).join(', ')));
+  /* --- proficiencies + equipment, side by side --- */
   const langs = ['Common'];
   if (char.classChoices.language) langs.push(char.classChoices.language);
   if (d.cls.id === 'rogue') langs.push("Thieves' Cant");
   if (d.cls.id === 'druid') langs.push('Druidic');
-  pr.appendChild(el('p', {}, el('b', { text: 'Languages: ' }), langs.join(', '), el('span', { class: 'muted', text: ' (plus two more of your choice, ask your DM)' })));
-  if (d.resistances.length) pr.appendChild(el('p', {}, el('b', { text: 'Resistances: ' }), d.resistances.join(', '), el('span', { class: 'muted', text: ' — that damage is halved against you' })));
-  left.appendChild(pr);
 
-  /* --- equipment --- */
-  const eq = section('Equipment');
-  const ul = el('ul');
-  for (const it of d.items) ul.appendChild(el('li', { text: it.name }));
-  if (d.gp) ul.appendChild(el('li', {}, el('b', { text: `${d.gp} GP` })));
-  eq.appendChild(ul);
+  const profSec = el('div', { class: 'cs-sec' }, el('h3', { text: 'Proficiencies & Languages' }));
+  profSec.appendChild(el('p', { class: 'cs-inline' }, el('b', { text: 'Armor: ' }), d.cls.armorTraining));
+  profSec.appendChild(el('p', { class: 'cs-inline' }, el('b', { text: 'Weapons: ' }), d.cls.weaponProficiencies));
+  if (d.tools.length) profSec.appendChild(el('p', { class: 'cs-inline' }, el('b', { text: 'Tools: ' }), d.tools.map(t => t.name).join(', ')));
+  profSec.appendChild(el('p', { class: 'cs-inline' }, el('b', { text: 'Languages: ' }), langs.join(', '),
+    el('span', { style: 'color:var(--text-dim)', text: ' (plus two more, ask your DM)' })));
+  if (d.darkvision) profSec.appendChild(el('p', { class: 'cs-inline' }, el('b', { text: 'Darkvision: ' }), `${d.darkvision} ft`));
+  if (d.resistances.length) profSec.appendChild(el('p', { class: 'cs-inline' }, el('b', { text: 'Resistances: ' }), d.resistances.join(', '),
+    el('span', { style: 'color:var(--text-dim)', text: ' (that damage is halved)' })));
+
+  const eqSec = el('div', { class: 'cs-sec' }, el('h3', { text: 'Equipment' }));
+  const eqList = el('ul', { class: 'cs-list', style: 'font-size:.76rem' });
+  // A class kit and a background kit can both grant the same item (two Holy
+  // Symbols, for instance). Show one row with a count rather than a repeat.
+  const counts = new Map();
+  for (const it of d.items) counts.set(it.name, (counts.get(it.name) || 0) + 1);
+  for (const [name, n] of counts) {
+    eqList.appendChild(el('li', {},
+      el('span', { class: 'nm', text: name }),
+      n > 1 ? el('span', { class: 'mod', text: `×${n}` }) : null));
+  }
+  if (d.gp) eqList.appendChild(el('li', {}, el('span', { class: 'nm' }, el('b', { text: `${d.gp} GP` }))));
+  eqSec.appendChild(eqList);
   for (const it of d.items) {
     const pack = DATA.byId.pack[it.name];
-    if (pack) eq.appendChild(el('p', { class: 'muted', style: 'font-size:.78rem', text: `${pack.name}: ${pack.contents.join(', ')}.` }));
+    if (pack) eqSec.appendChild(el('p', { class: 'cs-inline', style: 'color:var(--text-dim);font-size:.68rem;margin-top:5px',
+      text: `${pack.name}: ${pack.contents.join(', ')}.` }));
   }
-  left.appendChild(eq);
 
-  cols.appendChild(left);
-  cols.appendChild(right);
-  sheet.appendChild(cols);
-  root.appendChild(sheet);
+  // Proficiencies and equipment stay in the right column: they are short, they
+  // balance the tall skills rail on screen, and on paper they belong on page 1
+  // with the rest of what you need mid-combat.
+  rightCol.appendChild(el('div', { class: 'cs-pair' }, profSec, eqSec));
 
-  root.appendChild(notice('tip', 'What to do on your first turn',
-    firstTurnAdvice(d)));
+  body.appendChild(leftCol);
+  body.appendChild(rightCol);
+  cs.appendChild(body);
+  cs.appendChild(extra);
+  root.appendChild(cs);
 
-  root.appendChild(notice('', 'Levelling up later',
+  /* ---------------- guidance below the sheet ---------------- */
+  const guidance = el('div', { class: 'cs-print-hide', style: 'margin-top:18px' });
+  guidance.appendChild(notice('tip', 'What to do on your first turn', firstTurnAdvice(d)));
+  guidance.appendChild(notice('', 'Levelling up later',
     `At level 2 you gain more hit points and a new ${d.cls.name} feature. At level 3 you choose your subclass, which is the next big decision. This builder covers level 1; keep your sheet and come back when you level.`));
-}
-
-function section(title) {
-  return el('div', { class: 'sheet-sec' }, el('h3', { text: title }));
+  root.appendChild(guidance);
 }
 
 function firstTurnAdvice(d) {

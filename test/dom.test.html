@@ -139,7 +139,7 @@ async function run() {
     // The finished sheet must actually contain the sheet, not the "almost there" list.
     try {
       const box = renderInto('sheet', c);
-      const hasSheet = !!box.querySelector('.sheet');
+      const hasSheet = !!box.querySelector('.csheet');
       ok(`${cls.name}: sheet is complete`, hasSheet,
          hasSheet ? '' : box.textContent.slice(0, 200));
       if (hasSheet) {
@@ -147,7 +147,7 @@ async function run() {
         ok(`${cls.name}: AC is a sane number`, d.ac >= 8 && d.ac <= 21, `ac=${d.ac} (${d.acHow})`);
         ok(`${cls.name}: HP is a sane number`, d.hp >= 4 && d.hp <= 20, `hp=${d.hp}`);
         ok(`${cls.name}: sheet lists all 18 skills`,
-           box.querySelectorAll('.skilltable tr').length >= 18);
+           box.querySelectorAll('#cs-skills li').length === 18);
       }
     } catch (e) {
       ok(`${cls.name}: sheet is complete`, false, e.stack || e.message);

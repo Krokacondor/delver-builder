@@ -28,6 +28,9 @@ export function newCharacter() {
     featChoices: {},             // featId -> { cantrips:[], spell, ability, profs:[] }
     equipmentChoice: { class: null, background: 'a' },
     spells: { cantrips: [], prepared: [], spellbook: [] },
+    // State that changes during play rather than during character creation.
+    // currentHp null means "full"; it is resolved against max when rendered.
+    play: { currentHp: null, tempHp: '', deathSuccess: 0, deathFail: 0, slotsUsed: 0, inspiration: false },
     notes: ''
   };
 }
@@ -45,7 +48,11 @@ export function load() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const c = JSON.parse(raw);
-    return c && c.version === 1 ? { ...newCharacter(), ...c } : null;
+    if (!c || c.version !== 1) return null;
+    // Merge nested defaults too, so a character saved before a field existed
+    // still loads with that field present.
+    const base = newCharacter();
+    return { ...base, ...c, play: { ...base.play, ...(c.play || {}) }, spells: { ...base.spells, ...(c.spells || {}) } };
   } catch { return null; }
 }
 export function clearSaved() {
