@@ -455,6 +455,96 @@ function build(over = {}) {
   ok('All starting armor matches the armor table', badArmor.length === 0, badArmor.join(', '));
 }
 
+/* =========================================================
+   data/extras.json, when present. It is gitignored, so this
+   whole section is skipped on a fresh clone.
+   ========================================================= */
+{
+  const extrasPath = path.join(ROOT, 'data', 'extras.json');
+  if (!fs.existsSync(extrasPath)) {
+    results.push(['ok', 'extras.json absent, section skipped']);
+    pass++;
+  } else {
+    const extras = JSON.parse(fs.readFileSync(extrasPath, 'utf8'));
+    initData(files, extras);
+
+    ok('extras adds backgrounds', DATA.backgrounds.backgrounds.length > 4,
+       `count=${DATA.backgrounds.backgrounds.length}`);
+
+    // Every background's feat, skills, tool and abilities must resolve.
+    const broken = [];
+    for (const b of DATA.backgrounds.backgrounds) {
+      if (!DATA.byId.feat[b.feat]) broken.push(`${b.name}: unknown feat ${b.feat}`);
+      for (const s of b.skills || []) if (!DATA.byId.skill[s]) broken.push(`${b.name}: unknown skill ${s}`);
+      for (const a of b.abilities || []) if (!ABILS.includes(a)) broken.push(`${b.name}: unknown ability ${a}`);
+      for (const t of b.tools || []) {
+        if (t.chooseFrom && !DATA.equipment.toolCategories[t.chooseFrom]) {
+          broken.push(`${b.name}: unknown tool category ${t.chooseFrom}`);
+        }
+      }
+      if (!b.equipment || !Object.keys(b.equipment).length) broken.push(`${b.name}: no equipment options`);
+    }
+    ok('every background resolves its feat, skills, abilities and tools',
+       broken.length === 0, broken.join(' | '));
+
+    // Feat choices that grant tools must name a real category.
+    const badTool = [];
+    for (const f of DATA.feats.feats) {
+      for (const ch of f.choices || []) {
+        if (ch.grant?.type !== 'tool') continue;
+        const from = ch.grant.from;
+        if (!Array.isArray(from) && !DATA.equipment.toolCategories[from]) {
+          badTool.push(`${f.name}: ${from}`);
+        }
+      }
+    }
+    ok('tool-granting feats name a real tool category', badTool.length === 0, badTool.join(', '));
+
+    // Tough must actually raise hit points.
+    const farmer = DATA.byId.background['farmer'];
+    if (farmer) {
+      const c = build({
+        classId: 'fighter', speciesId: 'human',
+        speciesChoices: { size: 'Medium', skillful: 'perception', versatile: 'alert' },
+        abilityMethod: 'manual',
+        baseAbilities: { str: 15, dex: 13, con: 14, int: 8, wis: 12, cha: 10 },
+        backgroundId: 'farmer',
+        bgAbility: { mode: '2-1', plus2: 'str', plus1: 'con' },
+        classSkills: ['athletics', 'survival'],
+        classChoices: { fightingStyle: 'defense', weaponMastery: ['Greatsword', 'Flail', 'Javelin'] },
+        equipmentChoice: { class: 'A', background: 'b' }
+      });
+      const d = derive(c);
+      // d10 + CON 2 + Tough 2
+      check('Tough feat adds 2 HP at level 1', d.hp, 14);
+      ok('Tough is picked up from the Farmer background',
+         d.feats.some(f => f.feat.id === 'tough'), JSON.stringify(d.feats.map(f => f.feat.id)));
+    }
+
+    // A background whose feat needs picks must still validate once they are made.
+    const artisan = DATA.byId.background['artisan'];
+    if (artisan) {
+      const c = build({
+        classId: 'fighter', speciesId: 'dwarf',
+        abilityMethod: 'manual',
+        baseAbilities: { str: 15, dex: 13, con: 14, int: 10, wis: 12, cha: 8 },
+        backgroundId: 'artisan',
+        bgAbility: { mode: '2-1', plus2: 'str', plus1: 'con' },
+        classSkills: ['athletics', 'survival'],
+        classChoices: { fightingStyle: 'defense', weaponMastery: ['Greatsword', 'Flail', 'Javelin'], bgTool: "Smith's Tools" },
+        featChoices: { crafter: { profs: ["Smith's Tools", "Mason's Tools", "Tinker's Tools"] } },
+        equipmentChoice: { class: 'A', background: 'b' }
+      });
+      ok('Artisan background with Crafter picks validates',
+         stepIssues(c, 'proficiencies').length === 0,
+         JSON.stringify(stepIssues(c, 'proficiencies')));
+    }
+
+    // Restore the core-only dataset so nothing after this sees extras.
+    initData(files);
+  }
+}
+
 /* ---------- helpers used above ---------- */
 function ALL_ISSUES(c) {
   const ids = ['class', 'species', 'abilities', 'background', 'proficiencies', 'spells'];

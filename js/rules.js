@@ -343,10 +343,17 @@ export function derive(char) {
   const pb = 2; // level 1
   const eff = speciesEffects(char);
 
-  const hp = cls ? cls.hitDie + mods.con + (eff.hpPerLevel || 0) : 0;
+  const feats = collectFeats(char);
+  const featIds = feats.map(f => f.feat.id);
+
+  // Per-level hit point bonuses stack: Dwarven Toughness gives +1/level and the
+  // Tough feat gives +2/level, and a Dwarf with Tough gets both.
+  const hpPerLevel = (eff.hpPerLevel || 0)
+    + feats.reduce((sum, f) => sum + (f.feat.effects?.hpPerLevel || 0), 0);
+
+  const hp = cls ? cls.hitDie + mods.con + hpPerLevel * char.level : 0;
   const acInfo = computeAC(char, abilities);
 
-  const featIds = collectFeats(char).map(f => f.feat.id);
   const initiative = mods.dex + (featIds.includes('alert') ? pb : 0);
 
   const skillMap = collectSkills(char);
@@ -434,7 +441,7 @@ export function derive(char) {
     resistances: eff.resistances,
     size: sizeOf(char, sp),
     skills, saves, spellcasting,
-    feats: collectFeats(char),
+    feats,
     tools: collectTools(char),
     items, gp,
     attacks,

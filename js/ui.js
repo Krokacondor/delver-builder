@@ -80,22 +80,30 @@ export function checkRow({ label, sub, src, checked, disabled, onToggle }) {
 }
 
 /** Collapsible description with a Show more toggle for long SRD text. */
-export function expandable(text, clampAt = 220) {
+/* Spell text is shown in full. Level 0-1 descriptions run ~320 characters at
+   the median, so clamping them only hid the half of the sentence that said what
+   the spell actually does. Only genuinely long entries collapse, and they start
+   expanded so nothing is hidden unless the reader chooses to hide it. */
+export function expandable(text, collapseAbove = 1200) {
   const wrap = el('div');
   if (!text) return wrap;
-  const p = el('p', { class: 'spell-desc' + (text.length > clampAt ? ' clamped' : ''), text });
-  wrap.appendChild(p);
-  if (text.length > clampAt) {
+  const p = el('p', { class: 'spell-desc', text });
+
+  if (text.length > collapseAbove) {
     const btn = el('button', {
-      type: 'button', class: 'spell-more', text: 'Show more',
+      type: 'button', class: 'spell-more', text: 'Show less',
       onClick: e => {
         e.stopPropagation(); e.preventDefault();
-        const on = p.classList.toggle('clamped');
-        btn.textContent = on ? 'Show more' : 'Show less';
+        const collapsed = p.classList.toggle('clamped');
+        btn.textContent = collapsed ? 'Show more' : 'Show less';
       }
     });
+    wrap.appendChild(p);
     wrap.appendChild(btn);
+    return wrap;
   }
+
+  wrap.appendChild(p);
   return wrap;
 }
 

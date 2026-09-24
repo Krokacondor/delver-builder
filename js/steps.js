@@ -3,7 +3,7 @@
 
 import { DATA, spellsFor } from './data.js';
 import { el, pill, notice, counter, choiceCard, checkRow, difficultyDots, expandable } from './ui.js';
-import { ABILS, mod, fmt, derive, finalAbilities, backgroundBonuses, pointBuyCost, pointBuySpent, collectFeats, startingItems } from './rules.js';
+import { ABILS, mod, fmt, derive, finalAbilities, backgroundBonuses, pointBuyCost, pointBuySpent, collectFeats, startingItems, speciesEffects } from './rules.js';
 
 export const STEPS = [
   { id: 'class',         num: 1, label: 'Class' },
@@ -859,6 +859,38 @@ function renderToolPicker(spec, char, ctx) {
   return p;
 }
 
+/** Every spell the character already knows, excluding one feat's own picks.
+ *  Used to stop the same spell being taken twice from two different sources.
+ *  Returns Map<spellId, sourceName>. */
+function spellsKnownElsewhere(char, exceptFeatId) {
+  const known = new Map();
+  const add = (id, src) => { if (id && !known.has(id)) known.set(id, src); };
+
+  const sp = char.speciesId ? DATA.byId.species[char.speciesId] : null;
+  if (sp) {
+    const eff = speciesEffects(char);
+    for (const id of eff.cantrips) add(id, sp.name);
+    for (const id of eff.freeSpells) add(id, sp.name);
+  }
+
+  const cls = char.classId ? DATA.byId.class[char.classId] : null;
+  if (cls) {
+    for (const id of cls.spellcasting?.alwaysPrepared || []) add(id, cls.name);
+    for (const id of char.spells.cantrips) add(id, `${cls.name} cantrips`);
+    for (const id of char.spells.prepared) add(id, `${cls.name} spells`);
+    for (const id of char.spells.spellbook) add(id, 'your spellbook');
+  }
+
+  for (const { feat } of collectFeats(char)) {
+    if (feat.id === exceptFeatId) continue;
+    const picks = char.featChoices[feat.id];
+    if (!picks) continue;
+    for (const id of picks.cantrips || []) add(id, feat.name);
+    if (picks.spell) add(picks.spell, feat.name);
+  }
+  return known;
+}
+
 function renderFeatChoices(feat, source, char, ctx) {
   const p = el('div', { class: 'panel' });
   p.appendChild(el('h3', { text: `${feat.name} (from ${source})` }));
@@ -875,13 +907,21 @@ function renderFeatChoices(feat, source, char, ctx) {
       const key = isCantrip ? 'cantrips' : 'spell';
       picks[key] ||= isCantrip ? [] : null;
       const cur = asArray(picks[key]).filter(Boolean);
+
+      // Spells this character already knows from anywhere else: species traits,
+      // other feats, class features, and the class spells picked in step 6.
+      const known = spellsKnownElsewhere(char, feat.id);
+
       p.appendChild(counter(cur.length, g.count, 'chosen'));
       const l = el('div', { class: 'checklist' });
       for (const s of spellsFor(g.list, g.spellLevel)) {
         const on = cur.includes(s.id);
+        const alreadyFrom = known.get(s.id);
         l.appendChild(checkRow({
-          label: s.name, sub: s.description.slice(0, 120) + (s.description.length > 120 ? '…' : ''),
-          src: s.school, checked: on, disabled: !on && cur.length >= g.count,
+          label: s.name, sub: s.description,
+          src: alreadyFrom ? `already known from ${alreadyFrom}` : s.school,
+          checked: on,
+          disabled: !!alreadyFrom || (!on && cur.length >= g.count),
           onToggle: () => {
             const arr = asArray(picks[key]).filter(Boolean);
             toggleCapped(arr, s.id, g.count);
@@ -902,6 +942,25 @@ function renderFeatChoices(feat, source, char, ctx) {
         }));
       }
       p.appendChild(grid);
+    } else if (g.type === 'tool') {
+      // Tools only, drawn from one category (Crafter takes artisan's tools,
+      // Musician takes instruments).
+      picks.profs ||= [];
+      const cur = picks.profs.filter(Boolean);
+      p.appendChild(counter(cur.length, g.count, 'chosen'));
+      const l = el('div', { class: 'checklist' });
+      const pool = Array.isArray(g.from)
+        ? g.from
+        : (DATA.equipment.toolCategories[g.from] || []);
+      for (const t of pool) {
+        const on = cur.includes(t);
+        l.appendChild(checkRow({
+          label: t, src: 'tool', checked: on,
+          disabled: !on && cur.length >= g.count,
+          onToggle: () => { toggleCapped(picks.profs, t, g.count); ctx.update(); }
+        }));
+      }
+      p.appendChild(l);
     } else if (g.type === 'skillOrTool') {
       picks.profs ||= [];
       const cur = picks.profs.filter(Boolean);
@@ -997,6 +1056,22 @@ export function renderSpells(root, char, ctx) {
   const d = derive(char);
   const bonus = d.bonusSpells;
 
+  // A spell already granted by a species trait, an Origin feat or a class
+  // feature cannot be picked again: knowing Fire Bolt from Magic Initiate does
+  // not let a Wizard take it a second time as a class cantrip.
+  const known = new Map();
+  for (const b of bonus) if (!known.has(b.spell.id)) known.set(b.spell.id, b.source);
+
+  // If a grant appeared after the spell was already picked (the player went back
+  // and changed a feat), drop the now-duplicate pick rather than leaving it.
+  let pruned = false;
+  for (const key of ['cantrips', 'prepared', 'spellbook']) {
+    const before = char.spells[key].length;
+    char.spells[key] = char.spells[key].filter(id => !known.has(id));
+    if (char.spells[key].length !== before) pruned = true;
+  }
+  if (pruned) ctx.silentSave?.();
+
   if (!cls.spellcasting) {
     root.appendChild(notice('tip', `${cls.name}s do not cast spells at level 1`,
       'That is a good thing while you are learning. Your turns stay simple: move, attack, use a feature.'));
@@ -1041,6 +1116,7 @@ export function renderSpells(root, char, ctx) {
       note: 'Cantrips cost nothing and never run out. Take at least one that deals damage so you always have something to do on your turn.',
       list: sc.list, level: 0, need: sc.cantripsKnown,
       selected: char.spells.cantrips,
+      known,
       recommended: sc.recommended?.cantrips || [],
       onToggle: id => { toggleCapped(char.spells.cantrips, id, sc.cantripsKnown); ctx.update(); }
     }));
@@ -1053,6 +1129,7 @@ export function renderSpells(root, char, ctx) {
       note: `Write ${sc.spellbookSpells} level 1 spells into your book. These are yours permanently, even the ones you do not prepare today.`,
       list: sc.list, level: 1, need: sc.spellbookSpells,
       selected: char.spells.spellbook,
+      known,
       recommended: sc.recommended?.spellbook || [],
       onToggle: id => {
         toggleCapped(char.spells.spellbook, id, sc.spellbookSpells);
@@ -1068,6 +1145,7 @@ export function renderSpells(root, char, ctx) {
         onlyIds: char.spells.spellbook,
         list: sc.list, level: 1, need: sc.preparedSpells,
         selected: char.spells.prepared,
+        known,
         onToggle: id => { toggleCapped(char.spells.prepared, id, sc.preparedSpells); ctx.update(); }
       }));
     }
@@ -1079,6 +1157,7 @@ export function renderSpells(root, char, ctx) {
         : `Choose ${sc.preparedSpells}. You can swap one each time you level up, so pick carefully.`,
       list: sc.list, level: 1, need: sc.preparedSpells,
       selected: char.spells.prepared,
+      known,
       recommended: sc.recommended?.spells || [],
       onToggle: id => { toggleCapped(char.spells.prepared, id, sc.preparedSpells); ctx.update(); }
     }));
@@ -1103,7 +1182,7 @@ function renderBonusSpells(bonus) {
 }
 
 /** Reusable spell chooser with search and filters. */
-function spellPicker({ title, note, list, level, need, selected, onToggle, recommended = [], onlyIds }) {
+function spellPicker({ title, note, list, level, need, selected, onToggle, recommended = [], onlyIds, known = new Map() }) {
   const p = el('div', { class: 'panel' });
   p.appendChild(el('h3', { text: title }));
   p.appendChild(el('p', { class: 'panel-note', text: note }));
@@ -1153,9 +1232,16 @@ function spellPicker({ title, note, list, level, need, selected, onToggle, recom
     }
     for (const s of shown) {
       const on = selected.includes(s.id);
-      const card = el('div', { class: `spell${on ? ' on' : ''}`, role: 'button', tabindex: '0', 'aria-pressed': on ? 'true' : 'false' });
+      const alreadyFrom = known.get(s.id);
+      const card = el('div', {
+        class: `spell${on ? ' on' : ''}${alreadyFrom ? ' locked' : ''}`,
+        role: 'button', tabindex: alreadyFrom ? '-1' : '0',
+        'aria-pressed': on ? 'true' : 'false',
+        'aria-disabled': alreadyFrom ? 'true' : null
+      });
       const act = e => {
         if (e.target.closest('.spell-more')) return;
+        if (alreadyFrom) return;               // already known from another source
         if (!on && selected.length >= need) return;
         onToggle(s.id);
       };
@@ -1165,7 +1251,8 @@ function spellPicker({ title, note, list, level, need, selected, onToggle, recom
       card.appendChild(el('div', { class: 'spell-head' },
         el('span', { class: 'sname', text: s.name }),
         el('span', { class: 'sschool', text: s.school }),
-        recommended.includes(s.id) ? pill('Recommended', 'good') : null,
+        alreadyFrom ? pill(`Already known from ${alreadyFrom}`, 'info') : null,
+        !alreadyFrom && recommended.includes(s.id) ? pill('Recommended', 'good') : null,
         on ? pill('✓ chosen', 'accent') : null));
 
       const meta = el('div', { class: 'spell-meta' },

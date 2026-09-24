@@ -269,7 +269,9 @@ label { font-size: .88rem; }
 .rollchip small { display: block; font-family: var(--font); font-weight: 400; font-size: .68rem; color: var(--text-dim); }
 
 /* ---------- checkable lists ---------- */
-.checklist { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+/* align-items:start keeps each card the height of its own content, so one long
+   description does not stretch every other card in the same row. */
+.checklist { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); align-items: start; }
 .check {
   display: flex; gap: 9px; align-items: flex-start; cursor: pointer;
   padding: 9px 11px; border-radius: 9px; border: 1.5px solid var(--border);
@@ -297,13 +299,17 @@ label { font-size: .88rem; }
   padding: 10px 12px; cursor: pointer; transition: border-color .12s, background .12s;
 }
 .spell:hover { border-color: var(--accent-2); }
+/* A spell already granted by another source cannot be picked again. */
+.spell.locked { opacity: .5; cursor: not-allowed; background: var(--surface-2); }
+.spell.locked:hover { border-color: var(--border); }
 .spell.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
 .spell-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .spell-head .sname { font-weight: 700; font-size: .98rem; }
 .spell-head .sschool { font-size: .78rem; color: var(--text-dim); font-style: italic; }
 .spell-meta { display: flex; flex-wrap: wrap; gap: 5px; margin: 5px 0; }
 .spell-desc { font-size: .85rem; color: var(--text-dim); margin: 4px 0 0; }
-.spell-desc.clamped { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+/* Only applied when the reader collapses an unusually long spell themselves. */
+.spell-desc.clamped { display: -webkit-box; -webkit-line-clamp: 8; -webkit-box-orient: vertical; overflow: hidden; }
 .spell-more { font-size: .78rem; color: var(--accent); background: none; border: 0; padding: 2px 0; cursor: pointer; font-weight: 600; }
 
 /* ---------- summary rail ---------- */
