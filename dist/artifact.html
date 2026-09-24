@@ -417,6 +417,8 @@ label { font-size: .88rem; }
 
 /* --- main three-column body --- */
 .cs-body { display: grid; gap: 10px; grid-template-columns: 196px minmax(0, 1fr); align-items: start; }
+.cs-rail  { grid-column: 1; grid-row: 1 / span 2; }
+.cs-main  { grid-column: 2; grid-row: 1; }
 .cs-right { display: grid; gap: 10px; }
 
 /* --- ability score boxes --- */
@@ -526,13 +528,20 @@ label { font-size: .88rem; }
 .cs-cols2 > * { break-inside: avoid; }
 
 /* Full-width block under the stat block: features, proficiencies, equipment. */
-.cs-extra { display: grid; gap: 10px; margin-top: 10px; }
-.cs-pair { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); align-items: start; }
+.cs-extra { display: grid; gap: 10px; grid-column: 2; grid-row: 2; }
+/* stretch, not start: when one panel is much shorter than its neighbour the
+   box still runs the full height, so the difference reads as room on the page
+   rather than a ragged hole beside a tall box. */
+.cs-pair { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); align-items: stretch; }
+/* Column of panels that together fill the height of a taller neighbour. */
+.cs-stack { display: grid; gap: 10px; align-content: start; }
 
 /* --- adventure log: coins, found items, notes --- */
 .cs-log { display: grid; gap: 10px; margin-top: 10px; }
-.cs-coins { display: grid; gap: 8px; grid-template-columns: repeat(5, 1fr); }
-.cs-coins .bx { padding: 5px 4px; }
+/* Flex rather than grid so that when the row wraps on a narrow screen the
+   leftover boxes centre instead of hugging the left edge. */
+.cs-coins { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.cs-coins .bx { padding: 5px 4px; flex: 1 1 130px; min-width: 110px; max-width: 220px; }
 .cs-coins input {
   width: 100%; text-align: center; border: 0; background: none; padding: 0; color: var(--ink);
   font-family: var(--font-head); font-size: 1.3rem; font-weight: 700; line-height: 1.1;
@@ -552,11 +561,14 @@ label { font-size: .88rem; }
 }
 .cs-ruled:focus { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 
-@media (max-width: 760px) {
+/* Screen only. A printed page is about 700px wide, so an unscoped max-width
+   breakpoint also fires on paper: it was stretching the name box across the
+   whole sheet and wrapping the last two coin boxes onto a second row. */
+@media screen and (max-width: 760px) {
   .cs-body { grid-template-columns: 1fr; }
+  .cs-rail, .cs-main, .cs-extra { grid-column: 1; grid-row: auto; }
   .cs-head { grid-template-columns: repeat(2, 1fr); }
   .cs-name { grid-column: 1 / -1; }
-  .cs-coins { grid-template-columns: repeat(3, 1fr); }
   .cs-abils { grid-template-columns: repeat(3, 1fr); gap: 14px 8px; }
   .cs-hp { grid-template-columns: 1fr 1fr; }
   .cs-cols2 { columns: 1; }
@@ -579,7 +591,7 @@ label { font-size: .88rem; }
     --ink: #000; --line: #000; --hair: #999; --paper: #fff;
     /* The screen's dim grey is too light to read on paper. */
     --text-dim: #3f3f3f;
-    box-shadow: none; padding: 0; border: 0; font-size: 8.4pt;
+    box-shadow: none; padding: 0; border: 0; font-size: 7.8pt;
   }
   /* Browsers drop background colours when printing unless told otherwise, which
      silently emptied every filled proficiency dot, death save pip, spell slot
@@ -595,12 +607,12 @@ label { font-size: .88rem; }
   .cs-id { padding: 3px 6px; }
   .cs-body { gap: 6px; grid-template-columns: 180px minmax(0, 1fr); }
   .cs-right { gap: 6px; }
-  .cs-abils { gap: 5px; }
-  .cs-abil { padding: 3px 4px 8px; }
-  .cs-abil .m { font-size: 1.45rem; }
+  .cs-abils { gap: 4px; }
+  .cs-abil { padding: 2px 4px 7px; }
+  .cs-abil .m { font-size: 1.3rem; }
   .cs-abil .s { width: 30px; height: 19px; line-height: 17px; bottom: -9px; font-size: .72rem; }
-  .cs-list { font-size: .7rem; }
-  .cs-list li { padding: 0.5px 0; }
+  .cs-list { font-size: .69rem; }
+  .cs-list li { padding: 0; }
   .cs-sec { padding: 5px 7px 6px; }
   .cs-sec > h3 { margin-bottom: 4px; padding-bottom: 2px; }
   .cs-combat { gap: 5px; }
@@ -613,7 +625,7 @@ label { font-size: .88rem; }
   /* No forced break: each section avoids splitting internally, so whatever does
      not fit under the stat block flows onto page 2 together. Forcing a break
      here produced an extra near-empty page. */
-  .cs-extra { margin-top: 6px; }
+  .cs-extra { grid-column: 1 / -1; grid-row: 3; margin-top: 6px; }
 
   /* The log is a write-on page, so it gets one of its own and fills it. */
   .cs-log { break-before: page; margin-top: 0; }
@@ -625,6 +637,18 @@ label { font-size: .88rem; }
     line-height: 24px; font-size: 9pt; height: 432px;
   }
   .cs-coins input { font-size: 1.1rem; }
+
+
+  /* The left rail (six ability boxes, saves, eighteen skills) runs just over a
+     page on its own, which pushed the whole skills box to page 2. These trims
+     bring it back under. */
+  .cs-abil { padding: 1px 4px 6px; }
+  .cs-abil .m { font-size: 1.18rem; }
+  .cs-abil .k { font-size: .55rem; }
+  .cs-abil .s { width: 27px; height: 17px; line-height: 15px; bottom: -8px; font-size: .66rem; }
+  .cs-abils { gap: 3px; }
+  .cs-abils .cs-abil { margin-bottom: 5px; }
+  .cs-legend { display: none; }
 
   /* Dashed play fields read as blanks to write in on paper. */
   .cs-hp input.cur, .cs-hp input.temp { border-bottom: 1px solid #000; }

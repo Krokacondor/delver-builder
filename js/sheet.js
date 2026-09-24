@@ -145,7 +145,7 @@ export function renderSheet(root, char, ctx) {
       el('span', { class: 'mod', text: fmt(s.mod) })));
   }
   skillSec.appendChild(skillList);
-  skillSec.appendChild(el('p', { class: 'cs-inline', style: 'margin-top:6px;color:var(--text-dim);font-size:.68rem',
+  skillSec.appendChild(el('p', { class: 'cs-inline cs-legend', style: 'margin-top:6px;color:var(--text-dim);font-size:.68rem',
     text: 'Filled dot = proficient. Red dot = expertise (double bonus).' }));
   leftCol.appendChild(skillSec);
 
@@ -161,7 +161,9 @@ export function renderSheet(root, char, ctx) {
     stat('Speed', `${d.speed}`, 'feet'),
     stat('Proficiency', fmt(d.pb)),
     stat('Passive Perception', String(d.passivePerception)),
-    d.spellcasting ? stat('Spell Save DC', String(d.spellcasting.saveDC)) : stat('Size', d.size)
+    // Size already sits in the masthead, so non-casters simply get one box
+    // fewer here rather than a duplicate.
+    d.spellcasting ? stat('Spell Save DC', String(d.spellcasting.saveDC)) : null
   ));
 
   /* --- hit points --- */
@@ -328,15 +330,15 @@ export function renderSheet(root, char, ctx) {
   const extra = el('div', { class: 'cs-extra' });
   extra.appendChild(featSec);
 
-  /* --- weapon mastery --- */
+  /* --- weapon mastery (placed below, beside the equipment list) --- */
+  let masterySec = null;
   if (d.masteries.length) {
-    const sec = el('div', { class: 'cs-sec' }, el('h3', { text: 'Weapon Mastery' }));
+    masterySec = el('div', { class: 'cs-sec' }, el('h3', { text: 'Weapon Mastery' }));
     for (const m of d.masteries) {
-      sec.appendChild(el('div', { class: 'cs-feat' },
+      masterySec.appendChild(el('div', { class: 'cs-feat' },
         el('h4', { text: `${m.weapon}: ${m.mastery.name}` }),
         el('p', { text: m.mastery.plain })));
     }
-    extra.appendChild(sec);
   }
 
   /* --- proficiencies + equipment, side by side --- */
@@ -374,15 +376,24 @@ export function renderSheet(root, char, ctx) {
       text: `${pack.name}: ${pack.contents.join(', ')}.` }));
   }
 
-  // Proficiencies and equipment stay in the right column: they are short, they
-  // balance the tall skills rail on screen, and on paper they belong on page 1
-  // with the rest of what you need mid-combat.
-  rightCol.appendChild(el('div', { class: 'cs-pair' }, profSec, eqSec));
+  // Page 1 keeps what you reach for mid-combat: proficiencies and, for martial
+  // classes, the weapon mastery reminders, side by side so neither is a short
+  // box with a hole beside it. The equipment list is reference, so it moves
+  // down with the features and keeps page 1 from overflowing.
+  rightCol.appendChild(masterySec
+    ? el('div', { class: 'cs-pair' }, profSec, masterySec)
+    : profSec);
+  extra.insertBefore(eqSec, extra.firstChild);
 
+  // One grid: the rail spans both rows, so the lower sections sit beside its
+  // bottom half on screen instead of leaving a tall empty column. Print puts
+  // them full width on the next page instead.
+  leftCol.className = 'cs-rail';
+  rightCol.classList.add('cs-main');
   body.appendChild(leftCol);
   body.appendChild(rightCol);
+  body.appendChild(extra);
   cs.appendChild(body);
-  cs.appendChild(extra);
 
   /* ---------------- adventure log: room to write ----------------
      Starting gear is printed above and never changes. This page is for
@@ -413,8 +424,6 @@ export function renderSheet(root, char, ctx) {
   };
 
   const coinSec = el('div', { class: 'cs-sec' }, el('h3', { text: 'Coins' }), coinRow);
-  coinSec.appendChild(el('p', { class: 'cs-inline', style: 'margin-top:6px;color:var(--text-dim);font-size:.68rem',
-    text: d.gp ? `You started with ${d.gp} GP. Write your running total here.` : 'Write your running total here.' }));
 
   const itemSec = el('div', { class: 'cs-sec' },
     el('h3', { text: 'Items Found on the Journey' }),
