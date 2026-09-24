@@ -5,6 +5,13 @@ import { el, pill, notice } from './ui.js';
 import { ABILS, fmt, derive, stepIssues } from './rules.js';
 import { STEPS } from './steps.js';
 
+/* True when the page runs inside another page's frame, which is how a published
+   artifact is viewed. That frame refuses window.print() and page-initiated
+   downloads, so those affordances are swapped for copy-and-paste. */
+const EMBEDDED = (() => {
+  try { return window.self !== window.top; } catch { return true; }
+})();
+
 export function renderSheet(root, char, ctx) {
   // Anything still unfinished blocks a clean sheet; say exactly what and where.
   const blocking = [];
@@ -36,11 +43,36 @@ export function renderSheet(root, char, ctx) {
 
   const d = derive(char);
 
-  root.appendChild(el('div', { class: 'sheet-actions' },
-    el('button', { type: 'button', class: 'btn primary', text: 'Print / Save as PDF', onClick: () => window.print() }),
-    el('button', { type: 'button', class: 'btn', text: 'Download as text', onClick: () => downloadText(char, d) }),
-    el('button', { type: 'button', class: 'btn', text: 'Copy summary', onClick: e => copySummary(char, d, e.target) })
-  ));
+  // Inside an embedded viewer (a published artifact) the frame refuses
+  // window.print() and blocks downloads the page starts itself, so offer
+  // copy-and-paste instead of buttons that would silently do nothing.
+  const actions = el('div', { class: 'sheet-actions' });
+  if (!EMBEDDED) {
+    actions.appendChild(el('button', { type: 'button', class: 'btn primary', text: 'Print / Save as PDF', onClick: () => window.print() }));
+    actions.appendChild(el('button', { type: 'button', class: 'btn', text: 'Download as text', onClick: () => downloadText(char, d) }));
+  }
+  actions.appendChild(el('button', { type: 'button', class: 'btn' + (EMBEDDED ? ' primary' : ''), text: 'Copy summary', onClick: e => copySummary(char, d, e.target) }));
+  if (EMBEDDED) {
+    actions.appendChild(el('button', {
+      type: 'button', class: 'btn', text: 'Show as text',
+      onClick: e => {
+        const box = root.querySelector('#sheet-text');
+        const open = box.hidden;
+        box.hidden = !open;
+        e.target.textContent = open ? 'Hide text' : 'Show as text';
+        if (open) { box.value = sheetText(char, d); box.focus(); box.select(); }
+      }
+    }));
+  }
+  root.appendChild(actions);
+
+  if (EMBEDDED) {
+    root.appendChild(el('textarea', {
+      id: 'sheet-text', hidden: true, readonly: true, rows: '18',
+      'aria-label': 'Character sheet as plain text, ready to copy',
+      style: 'width:100%;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem;margin-bottom:16px'
+    }));
+  }
 
   const sheet = el('div', { class: 'sheet' });
 
