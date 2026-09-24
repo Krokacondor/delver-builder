@@ -395,7 +395,6 @@ export function renderSheet(root, char, ctx) {
     const input = el('input', {
       type: 'number', min: '0', id: `cs-coin-${key}`,
       value: play.coins[key] ?? '',
-      placeholder: key === 'gp' && d.gp ? String(d.gp) : '',
       'aria-label': `${label} pieces`,
       onInput: e => { play.coins[key] = e.target.value; saveQuiet(); }
     });
