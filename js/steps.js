@@ -891,6 +891,42 @@ function spellsKnownElsewhere(char, exceptFeatId) {
   return known;
 }
 
+/** Skill and tool proficiencies the character already holds, ignoring one
+ *  feat's own picks. Returns Map<skillId|toolName, sourceName>. */
+function profsHeldElsewhere(char, exceptFeatId) {
+  const held = new Map();
+  const add = (id, src) => { if (id && !held.has(id)) held.set(id, src); };
+
+  const cls = char.classId ? DATA.byId.class[char.classId] : null;
+  if (cls) {
+    for (const s of char.classSkills) add(s, cls.name);
+    if (typeof cls.toolProficiencies === 'string') add(cls.toolProficiencies, cls.name);
+    for (const t of asArray(char.classChoices.tools)) add(t, cls.name);
+  }
+
+  const bg = char.backgroundId ? DATA.byId.background[char.backgroundId] : null;
+  if (bg) {
+    const skills = char.backgroundId === 'custom' ? char.customBg.skills : bg.skills || [];
+    for (const s of skills) add(s, bg.name);
+    if (char.backgroundId === 'custom') add(char.customBg.tool, bg.name);
+    else for (const t of bg.tools || []) add(t.fixed || char.classChoices.bgTool, bg.name);
+  }
+
+  const sp = char.speciesId ? DATA.byId.species[char.speciesId] : null;
+  if (sp) {
+    for (const ch of sp.choices || []) {
+      if (ch.grant?.type !== 'skill') continue;
+      for (const v of asArray(char.speciesChoices[ch.id])) add(v, sp.name);
+    }
+  }
+
+  for (const { feat } of collectFeats(char)) {
+    if (feat.id === exceptFeatId) continue;
+    for (const v of asArray(char.featChoices[feat.id]?.profs)) add(v, feat.name);
+  }
+  return held;
+}
+
 function renderFeatChoices(feat, source, char, ctx) {
   const p = el('div', { class: 'panel' });
   p.appendChild(el('h3', { text: `${feat.name} (from ${source})` }));
@@ -964,21 +1000,30 @@ function renderFeatChoices(feat, source, char, ctx) {
     } else if (g.type === 'skillOrTool') {
       picks.profs ||= [];
       const cur = picks.profs.filter(Boolean);
+
+      // Proficiency you already have is not worth taking twice, so anything
+      // granted by the class, background, species or another feat is locked.
+      const had = profsHeldElsewhere(char, feat.id);
+
       p.appendChild(counter(cur.length, g.count, 'chosen'));
       const l = el('div', { class: 'checklist' });
       for (const s of DATA.rules.skills) {
         const on = cur.includes(s.id);
+        const from = had.get(s.id);
         l.appendChild(checkRow({
-          label: s.name, sub: s.blurb, src: DATA.byId.ability[s.ability].short,
-          checked: on, disabled: !on && cur.length >= g.count,
+          label: s.name, sub: s.blurb,
+          src: from ? `already from ${from}` : DATA.byId.ability[s.ability].short,
+          checked: on, disabled: !!from || (!on && cur.length >= g.count),
           onToggle: () => { toggleCapped(picks.profs, s.id, g.count); ctx.update(); }
         }));
       }
       for (const [, tools] of Object.entries(DATA.equipment.toolCategories)) {
         for (const t of tools) {
           const on = cur.includes(t);
+          const from = had.get(t);
           l.appendChild(checkRow({
-            label: t, src: 'tool', checked: on, disabled: !on && cur.length >= g.count,
+            label: t, src: from ? `already from ${from}` : 'tool',
+            checked: on, disabled: !!from || (!on && cur.length >= g.count),
             onToggle: () => { toggleCapped(picks.profs, t, g.count); ctx.update(); }
           }));
         }

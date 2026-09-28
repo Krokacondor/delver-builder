@@ -6,7 +6,7 @@
    during play (current HP, temporary HP, death saves, spent spell slots) are
    editable and stored on char.play. */
 
-import { DATA } from './data.js';
+import { DATA, spellsFor } from './data.js';
 import { el, notice } from './ui.js';
 import { ABILS, fmt, derive, stepIssues } from './rules.js';
 import { STEPS } from './steps.js';
@@ -437,6 +437,9 @@ export function renderSheet(root, char, ctx) {
 
   log.appendChild(coinSec);
   log.appendChild(el('div', { class: 'cs-pair' }, itemSec, noteSec));
+
+  const spellPage = buildSpellPage(char, d);
+  if (spellPage) cs.appendChild(spellPage);
   cs.appendChild(log);
 
   root.appendChild(cs);
@@ -447,6 +450,73 @@ export function renderSheet(root, char, ctx) {
   guidance.appendChild(notice('', 'Levelling up later',
     `At level 2 you gain more hit points and a new ${d.cls.name} feature. At level 3 you choose your subclass, which is the next big decision. This builder covers level 1; keep your sheet and come back when you level.`));
   root.appendChild(guidance);
+}
+
+/* ---------------- spell reference page ----------------
+   Full text of every spell the character has, so the sheet works at the table
+   without a rulebook. Classes that re-choose their prepared list after a Long
+   Rest also get the rest of their level 1 list, since any of those spells can
+   be swapped in tomorrow morning. */
+function buildSpellPage(char, d) {
+  const sc = d.spellcasting;
+
+  // Spells the character currently has, from every source.
+  const own = [];
+  const seen = new Set();
+  const push = (spell, note) => {
+    if (!spell || seen.has(spell.id)) return;
+    seen.add(spell.id);
+    own.push({ spell, note });
+  };
+  for (const id of char.spells.cantrips) push(DATA.byId.spell[id], 'cantrip, at will');
+  for (const b of d.bonusSpells) {
+    push(b.spell, b.kind === 'cantrip' ? `at will, from ${b.source}`
+      : b.kind === 'always' ? `always prepared, from ${b.source}`
+      : `free once per Long Rest, from ${b.source}`);
+  }
+  for (const id of char.spells.prepared) push(DATA.byId.spell[id], 'prepared');
+  for (const id of char.spells.spellbook) push(DATA.byId.spell[id], 'in your spellbook');
+
+  if (!own.length) return null;
+
+  const page = el('div', { class: 'cs-spells' });
+  const sec = el('div', { class: 'cs-sec tall' }, el('h3', { text: 'Your Spells' }));
+  const grid = el('div', { class: 'cs-cols2' });
+  own.sort((a, b) => a.spell.level - b.spell.level || a.spell.name.localeCompare(b.spell.name));
+  for (const { spell, note } of own) grid.appendChild(spellEntry(spell, note));
+  sec.appendChild(grid);
+  page.appendChild(sec);
+
+  // The swap pool, for classes that rebuild the list on a Long Rest. A Wizard
+  // swaps from the spellbook, which is already printed above, so it is skipped.
+  if (sc && sc.prepareStyle !== 'spellbook' && /Long Rest/i.test(sc.changeWhen || '')) {
+    const pool = spellsFor(sc.list, 1).filter(s => !seen.has(s.id));
+    if (pool.length) {
+      const swapSec = el('div', { class: 'cs-sec tall' },
+        el('h3', { text: `Other Level 1 ${d.cls.name} Spells You Can Prepare` }));
+      swapSec.appendChild(el('p', { class: 'cs-inline', style: 'color:var(--text-dim);margin-bottom:8px',
+        text: sc.changeWhen === 'Long Rest'
+          ? `After a Long Rest you may rebuild your prepared list from scratch. Any ${sc.preparedSpells} of these can replace what you have.`
+          : 'After a Long Rest you may swap one prepared spell for any of these.' }));
+      const swapGrid = el('div', { class: 'cs-cols2' });
+      for (const s of pool) swapGrid.appendChild(spellEntry(s, null));
+      swapSec.appendChild(swapGrid);
+      page.appendChild(swapSec);
+    }
+  }
+  return page;
+}
+
+function spellEntry(s, note) {
+  const meta = [s.castingTime, s.range, s.components, s.duration].filter(Boolean).join(' · ');
+  return el('div', { class: 'cs-spell' },
+    el('h4', {},
+      s.name,
+      el('span', { class: 'lvl', text: s.level === 0 ? ' Cantrip' : ` Level ${s.level} ${s.school}` }),
+      note ? el('span', { class: 'note', text: ` — ${note}` }) : null),
+    el('p', { class: 'meta', text: meta }),
+    el('p', { class: 'desc', text: s.description }),
+    s.higherLevel ? el('p', { class: 'up', text: `Higher level: ${s.higherLevel}` }) : null);
 }
 
 function firstTurnAdvice(d) {

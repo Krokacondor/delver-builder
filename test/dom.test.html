@@ -203,6 +203,76 @@ async function run() {
     ok('custom background renders', false, e.stack || e.message);
   }
 
+  // The Skilled feat must not offer proficiency the character already has.
+  try {
+    const c = newCharacter();
+    c.classId = 'fighter';
+    c.speciesId = 'human';
+    c.speciesChoices = { size: 'Medium', skillful: 'perception', versatile: 'skilled' };
+    c.abilityMethod = 'manual';
+    c.baseAbilities = { str: 15, dex: 13, con: 14, int: 8, wis: 12, cha: 10 };
+    c.backgroundId = 'soldier';
+    c.bgAbility = { mode: '2-1', plus2: 'str', plus1: 'con' };
+    c.classSkills = ['athletics', 'survival'];          // class
+    c.classChoices = { fightingStyle: 'defense', weaponMastery: ['Greatsword', 'Flail', 'Javelin'], bgTool: 'Dice Set' };
+    c.equipmentChoice = { class: 'A', background: 'a' };
+
+    const box = renderInto('proficiencies', c);
+    const rows = [...box.querySelectorAll('.check')];
+    const rowFor = name => rows.filter(r => r.querySelector('.lbl')?.textContent.startsWith(name)).pop();
+
+    // athletics + survival from the class, intimidation from Soldier,
+    // perception from the Human's free skill.
+    for (const [name, src] of [['Athletics', 'class'], ['Survival', 'class'],
+                               ['Intimidation', 'background'], ['Perception', 'species']]) {
+      const row = rowFor(name);
+      ok(`Skilled: ${name} is locked (already from ${src})`,
+         !!row && row.querySelector('input').disabled,
+         row ? row.querySelector('.lbl').textContent : 'row not found');
+    }
+    // Something the character does not have must still be selectable.
+    const free = rowFor('Arcana');
+    ok('Skilled: an unheld skill is still selectable',
+       !!free && !free.querySelector('input').disabled,
+       free ? free.querySelector('.lbl').textContent : 'row not found');
+    // Tools already held are locked too.
+    const dice = rowFor('Dice Set');
+    ok('Skilled: a tool already held is locked',
+       !!dice && dice.querySelector('input').disabled,
+       dice ? dice.querySelector('.lbl').textContent : 'row not found');
+  } catch (e) {
+    ok('Skilled respects existing proficiencies', false, e.stack || e.message);
+  }
+
+  // Casters get a spell page; classes that re-prepare daily also get the pool.
+  for (const id of ['cleric', 'wizard', 'fighter']) {
+    try {
+      const c = buildFor(id);
+      const box = renderInto('sheet', c);
+      const page = box.querySelector('.cs-spells');
+      const entries = page ? page.querySelectorAll('.cs-spell').length : 0;
+      if (id === 'fighter') {
+        ok('fighter without magic has no spell page', !page);
+      } else {
+        ok(`${id}: spell page lists every known spell in full`,
+           !!page && entries >= (c.spells.cantrips.length + c.spells.prepared.length),
+           `entries=${entries}`);
+      }
+      if (id === 'cleric') {
+        const heads = [...(page?.querySelectorAll('h3') || [])].map(h => h.textContent);
+        ok('cleric spell page includes the swap pool',
+           heads.some(h => /Other Level 1/.test(h)), JSON.stringify(heads));
+      }
+      if (id === 'wizard') {
+        const heads = [...(page?.querySelectorAll('h3') || [])].map(h => h.textContent);
+        ok('wizard spell page does not dump the whole wizard list',
+           !heads.some(h => /Other Level 1/.test(h)), JSON.stringify(heads));
+      }
+    } catch (e) {
+      ok(`${id}: spell page renders`, false, e.stack || e.message);
+    }
+  }
+
   await new Promise(r => setTimeout(r, 120));
   ok('no uncaught errors', errors.length === 0, errors.join(' | '));
 

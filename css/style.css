@@ -534,6 +534,17 @@ label { font-size: .88rem; }
 /* Column of panels that together fill the height of a taller neighbour. */
 .cs-stack { display: grid; gap: 10px; align-content: start; }
 
+/* --- spell reference page --- */
+.cs-spells { display: grid; gap: 10px; margin-top: 10px; grid-column: 1 / -1; }
+.cs-spell { break-inside: avoid; margin-bottom: 9px; }
+.cs-spell:last-child { margin-bottom: 0; }
+.cs-spell h4 { margin: 0; font-family: var(--font); font-size: .82rem; font-weight: 700; }
+.cs-spell .lvl { font-weight: 400; font-size: .68rem; color: var(--text-dim); font-style: italic; }
+.cs-spell .note { font-weight: 400; font-size: .68rem; color: var(--accent); }
+.cs-spell .meta { margin: 1px 0 2px; font-size: .67rem; color: var(--text-dim); }
+.cs-spell .desc { margin: 0; font-size: .74rem; line-height: 1.42; }
+.cs-spell .up { margin: 2px 0 0; font-size: .68rem; color: var(--text-dim); }
+
 /* --- adventure log: coins, found items, notes --- */
 .cs-log { display: grid; gap: 10px; margin-top: 10px; }
 /* Flex rather than grid so that when the row wraps on a narrow screen the
@@ -625,7 +636,12 @@ label { font-size: .88rem; }
      here produced an extra near-empty page. */
   .cs-extra { grid-column: 1 / -1; grid-row: 3; margin-top: 6px; }
 
-  /* The log is a write-on page, so it gets one of its own and fills it. */
+  /* Spell reference and the write-on log each start a fresh page. */
+  .cs-spells { break-before: page; margin-top: 0; }
+  .cs-spells .cs-cols2 { columns: 2; column-gap: 14px; }
+  .cs-spell .desc { font-size: .68rem; line-height: 1.35; }
+  .cs-spell h4 { font-size: .76rem; }
+
   .cs-log { break-before: page; margin-top: 0; }
   .cs-log .cs-sec { break-inside: avoid; }
   .cs-ruled {
