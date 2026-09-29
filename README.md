@@ -6,13 +6,13 @@ Everything is explained twice: once in the actual rules text, and once in plain 
 
 ## The seven steps
 
-1. **Class** — what your character does. Sorted with the simplest classes flagged.
-2. **Species** — what kind of person they are. (In the 2024 rules this does *not* change ability scores.)
-3. **Ability scores** — standard array, point buy, rolling, or typing them in.
-4. **Background** — where your +2/+1 ability bonuses, Origin feat, skills and tool come from.
-5. **Proficiencies & gear** — class skills, feature choices, weapon mastery, starting equipment.
-6. **Spells** — cantrips and level 1 spells, with search and filters. Skipped automatically for classes that do not cast.
-7. **Character sheet** — the finished thing, with every number worked out and every spell written in full.
+1. **Class**: what your character does. Sorted with the simplest classes flagged.
+2. **Species**: what kind of person they are. (In the 2024 rules this does *not* change ability scores.)
+3. **Ability scores**: standard array, point buy, rolling, or typing them in.
+4. **Background**: where your +2/+1 ability bonuses, Origin feat, skills and tool come from.
+5. **Proficiencies & gear**: class skills, feature choices, weapon mastery, starting equipment.
+6. **Spells**: cantrips and level 1 spells, with search and filters. Skipped automatically for classes that do not cast.
+7. **Character sheet**: the finished thing, with every number worked out and every spell written in full.
 
 Progress saves to your browser automatically. There is a rules glossary behind the **Reference** button.
 
@@ -26,7 +26,11 @@ npm run serve     # http://localhost:8123
 
 You cannot just double-click `index.html`: browsers block `fetch` on `file://` URLs, so the data files will not load. Any local web server works.
 
-## Publishing to GitHub Pages
+## Live site
+
+<https://krokacondor.github.io/dnd-builder/>
+
+To publish a fork of your own:
 
 ```bash
 git remote add origin https://github.com/<you>/<repo>.git
@@ -60,6 +64,20 @@ Two ways to cover the gap:
 - **Custom Background** is built into step 4. It uses the official custom-background rules from the SRD Gameplay Toolbox, so players can invent whatever background they want.
 - **`data/extras.json`** is loaded automatically if it exists and is gitignored, so it never reaches GitHub. Copy `data/extras.example.json` to `data/extras.json` and fill in content from your own copy of the Player's Handbook. Entries with a new id are added; entries reusing an existing id replace it.
 
+## Next steps
+
+Planned work, roughly in the order it is likely to happen.
+
+1. **Fixing any visual issues.** Ongoing polish of the layout on screen and in print. The character sheet in particular has had several rounds already and still deserves a close look at odd spacing, panels that do not fill their column, and how it behaves on a phone.
+
+2. **Working with the official D&D character sheet.** Right now the app draws its own sheet. The goal is to also fill the official Wizards of the Coast sheet, so a player can hand in the form their group already uses instead of a lookalike.
+
+3. **Saving characters properly.** Today a character lives in one browser's local storage, one at a time, and clearing site data loses it. Needed: more than one character per person, export and import as a file, and something that survives switching devices.
+
+4. **Levels 2 through 20.** The app stops at level 1. Levelling up brings subclasses at level 3, Ability Score Improvements and feats, higher-level spell slots and prepared counts, and per-class features at every step.
+
+5. **Additional book sources.** Content beyond the SRD, added through the same `data/extras.json` mechanism described above so that anything not freely licensed stays out of the public repo.
+
 ## Project layout
 
 ```
@@ -72,8 +90,8 @@ js/steps.js           the seven step screens
 js/sheet.js           the final sheet, plus text export
 js/app.js             navigation, summary rail, theme, reference modal
 data/*.json           all game content
-test/rules.test.mjs   101 assertions on the character math
-test/dom.test.html    168 assertions that every screen renders
+test/rules.test.mjs   115 assertions on the character math
+test/dom.test.html    179 assertions that every screen renders
 sources/              the SRD parser and dev server
 ```
 
