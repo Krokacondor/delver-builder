@@ -51,18 +51,19 @@ Everything the SRD covers is here:
 |---|---|
 | Classes (full level 1 data) | 12 |
 | Species | 9 |
-| Backgrounds | 4 |
-| Origin / Fighting Style / General feats | 12 |
+| Backgrounds | 4 (plus 12 from the Player's Handbook, see below) |
+| Origin / Fighting Style / General feats | 12 (plus 6 from the Player's Handbook) |
 | Spells (all levels, fully parsed) | 339 |
 | Weapons with mastery properties | 38 |
 | Armor | 12 |
 
-**Not in the SRD**, and therefore not in this repo: Aasimar, 12 of the 16 Player's Handbook backgrounds, and three of the four subclasses per class. Subclasses do not matter here because the 2024 rules start subclasses at level 3.
+**Not in the SRD:** Aasimar, 12 of the 16 Player's Handbook backgrounds, and three of the four subclasses per class. Subclasses do not matter here, because the 2024 rules start subclasses at level 3.
 
-Two ways to cover the gap:
+Three things close that gap:
 
-- **Custom Background** is built into step 4. It uses the official custom-background rules from the SRD Gameplay Toolbox, so players can invent whatever background they want.
-- **`data/extras.json`** is loaded automatically if it exists and is gitignored, so it never reaches GitHub. Copy `data/extras.example.json` to `data/extras.json` and fill in content from your own copy of the Player's Handbook. Entries with a new id are added; entries reusing an existing id replace it.
+- **`data/extras.json`** is loaded automatically when present and merges into the core data. It supplies the 12 remaining Player's Handbook backgrounds and the 6 Origin feats they grant (Crafter, Healer, Lucky, Musician, Tavern Brawler, Tough), so all 16 backgrounds are available. Every field was checked against the book: ability scores, Origin feat, skills, tool and both equipment options. Only the mechanics are reproduced, which are game rules rather than copyrightable expression; all descriptive prose in that file is original.
+- **Custom Background** is built into step 4. It uses the official custom-background rules from the SRD Gameplay Toolbox, so a player can invent whatever background they want.
+- **Your own additions.** Entries in `extras.json` with a new id are added; entries reusing an existing id replace the core one. `data/extras.example.json` shows the shape. To keep an addition off GitHub, put it in a separate file and add that filename to `.gitignore`.
 
 ## Next steps
 
@@ -76,7 +77,7 @@ Planned work, roughly in the order it is likely to happen.
 
 4. **Levels 2 through 20.** The app stops at level 1. Levelling up brings subclasses at level 3, Ability Score Improvements and feats, higher-level spell slots and prepared counts, and per-class features at every step.
 
-5. **Additional book sources.** Content beyond the SRD, added through the same `data/extras.json` mechanism described above so that anything not freely licensed stays out of the public repo.
+5. **Additional book sources.** Content beyond the SRD and the Player's Handbook, added through the same `data/extras.json` merge mechanism described above.
 
 ## Project layout
 
