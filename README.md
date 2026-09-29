@@ -28,7 +28,7 @@ You cannot just double-click `index.html`: browsers block `fetch` on `file://` U
 
 ## Live site
 
-<https://krokacondor.github.io/dnd-builder/>
+<https://krokacondor.github.io/delver-builder/>
 
 To publish a fork of your own:
 
