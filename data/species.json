@@ -2,7 +2,7 @@
   "note": "Species rules text from SRD 5.2.1 (CC-BY-4.0). 'plain' fields are original plain-language rewrites for new players.",
   "rules": {
     "intro": "Your species is the kind of person your character is: dwarf, elf, orc and so on. In the 2024 rules your species does NOT change your ability scores. Those come from your background instead. Species gives you traits: darkvision, resistances, a bit of free magic, or a once-per-rest trick.",
-    "noAsiNote": "Coming from older D&D? This is the big change. Picking Dwarf no longer gives +2 Constitution. Any species works with any class, so pick the one you think is coolest."
+    "noAsiNote": "Coming from an older edition? This is the big change. Picking Dwarf no longer gives +2 Constitution. Any species works with any class, so pick the one you think is coolest."
   },
   "species": [
     {

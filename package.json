@@ -1,7 +1,7 @@
 {
-  "name": "dnd-builder",
+  "name": "delver-builder",
   "version": "1.0.0",
-  "description": "Level 1 D&D 2024 character builder (SRD 5.2.1, CC-BY-4.0)",
+  "description": "Level 1 character builder for fifth edition (SRD 5.2.1, CC-BY-4.0)",
   "main": "index.js",
   "scripts": {
     "test": "node test/rules.test.mjs",

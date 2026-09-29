@@ -36,7 +36,7 @@ export function renderClass(root, char, ctx) {
   root.appendChild(head('Step 1: Choose your class',
     'Your class decides how you fight, what you are good at, and whether you cast spells. It is the biggest decision here, which is why it comes first.'));
 
-  root.appendChild(notice('tip', 'New to D&D?',
+  root.appendChild(notice('tip', 'New to tabletop roleplaying?',
     'The three easiest classes are Fighter, Barbarian and Rogue. None of them cast spells at level 1, so there is much less to keep track of while you learn.'));
 
   root.appendChild(notice('', 'About subclasses',

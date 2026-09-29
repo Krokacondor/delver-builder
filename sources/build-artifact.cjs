@@ -17,7 +17,7 @@ const html = read('index.html');
 const css = read('css/style.css');
 
 // Pull out <title> and everything between <body> and </body>.
-const title = (html.match(/<title>([^<]*)<\/title>/) || [, 'Level 1 Character Builder'])[1];
+const title = (html.match(/<title>([^<]*)<\/title>/) || [, 'Delver-Builder'])[1];
 const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/);
 if (!bodyMatch) {
   console.error('Could not find <body> in index.html');

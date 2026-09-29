@@ -1,6 +1,6 @@
-# Level 1 Character Builder
+# Delver-Builder
 
-A step-by-step D&D 2024 character builder aimed at players who have never made a character before. It walks you through seven screens and ends with a complete, printable level 1 character sheet.
+A step-by-step level 1 character builder for fifth edition, aimed at players who have never made a character before. It walks you through seven screens and ends with a complete, printable level 1 character sheet.
 
 Everything is explained twice: once in the actual rules text, and once in plain language.
 
@@ -71,7 +71,7 @@ Planned work, roughly in the order it is likely to happen.
 
 1. **Fixing any visual issues.** Ongoing polish of the layout on screen and in print. The character sheet in particular has had several rounds already and still deserves a close look at odd spacing, panels that do not fill their column, and how it behaves on a phone.
 
-2. **Working with the official D&D character sheet.** Right now the app draws its own sheet. The goal is to also fill the official Wizards of the Coast sheet, so a player can hand in the form their group already uses instead of a lookalike.
+2. **Working with the official character sheet.** Right now the app draws its own sheet. The goal is to also fill the official Wizards of the Coast sheet, so a player can hand in the form their group already uses instead of a lookalike.
 
 3. **Saving characters properly.** Today a character lives in one browser's local storage, one at a time, and clearing site data loses it. Needed: more than one character per person, export and import as a file, and something that survives switching devices.
 
@@ -135,6 +135,6 @@ This project has three layers, under different terms. They are kept separate on 
 
 This work includes material from the System Reference Document 5.2.1 ("SRD 5.2.1") by Wizards of the Coast LLC, available at <https://www.dndbeyond.com/srd>. The SRD 5.2.1 is licensed under the Creative Commons Attribution 4.0 International License, available at <https://creativecommons.org/licenses/by/4.0/legalcode>.
 
-Level 1 Character Builder is unofficial Fan Content permitted under the Fan Content Policy. Not approved/endorsed by Wizards. Portions of the materials used are property of Wizards of the Coast. ©Wizards of the Coast LLC.
+Delver-Builder is unofficial Fan Content permitted under the Fan Content Policy. Not approved/endorsed by Wizards. Portions of the materials used are property of Wizards of the Coast. ©Wizards of the Coast LLC.
 
 Compatible with fifth edition. This is a free, non-commercial project. Not affiliated with Wizards of the Coast.
