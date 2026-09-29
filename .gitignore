@@ -8,3 +8,6 @@ sources/level1features.txt
 
 .DS_Store
 Thumbs.db
+
+# Local operational notes, not part of the published project.
+TAKEDOWN-RUNBOOK.md

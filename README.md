@@ -121,8 +121,20 @@ npm run build-spells
 
 The parser reads the per-class spell list tables to get canonical spell names, then parses the spell description blocks and reconciles the two.
 
+## Licensing
+
+This project has three layers, under different terms. They are kept separate on purpose, because only one of them is this project's to give away.
+
+**The code** is licensed under the Apache License 2.0. See `LICENSE`. That covers the HTML, CSS and JavaScript, the parser and build scripts, the tests, and the original plain-language explanations written for this project. Reuse it freely.
+
+**The SRD game content** is from the System Reference Document 5.2.1, published by Wizards of the Coast under CC-BY-4.0, which permits redistribution with attribution. That is the classes, species, spells, equipment, feats, and the Acolyte, Criminal, Sage and Soldier backgrounds. The required attribution is below and in the site footer.
+
+**The remaining 12 backgrounds and 6 Origin feats** in `data/extras.json` are from the 2024 Player's Handbook, which is not under an open license. Only their mechanics are reproduced: which ability scores, which feat, which two skills, which tool, which starting items. Game mechanics are not copyrightable, and no wording from the book appears anywhere in this repo. Every line of description in that file was written for this project. This layer is used, not licensed, and is not yours to redistribute on the strength of the Apache license above.
+
 ## Attribution
 
 This work includes material from the System Reference Document 5.2.1 ("SRD 5.2.1") by Wizards of the Coast LLC, available at <https://www.dndbeyond.com/srd>. The SRD 5.2.1 is licensed under the Creative Commons Attribution 4.0 International License, available at <https://creativecommons.org/licenses/by/4.0/legalcode>.
 
-Compatible with fifth edition. The plain-language explanations, the code and the design are original work. Not affiliated with Wizards of the Coast.
+Level 1 Character Builder is unofficial Fan Content permitted under the Fan Content Policy. Not approved/endorsed by Wizards. Portions of the materials used are property of Wizards of the Coast. ©Wizards of the Coast LLC.
+
+Compatible with fifth edition. This is a free, non-commercial project. Not affiliated with Wizards of the Coast.
