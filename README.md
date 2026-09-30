@@ -125,7 +125,7 @@ The parser reads the per-class spell list tables to get canonical spell names, t
 
 Everything in this repository is under a licence that permits redistribution. There are two layers, and the distinction matters if you reuse the project.
 
-**The code** is licensed under the MIT Licence. See `LICENSE`. That covers the HTML, CSS and JavaScript, the parser and build scripts, the tests, and the original plain-language explanations written for this project. Reuse it freely.
+**The code** is licensed under the MIT Licence. See `LICENSE`, and `NOTICE` for how that licence relates to the game data. That covers the HTML, CSS and JavaScript, the parser and build scripts, the tests, and the original plain-language explanations written for this project. Reuse it freely.
 
 **The game content** under `data/` is from the System Reference Document 5.2.1, published by Wizards of the Coast under CC-BY-4.0. That licence permits redistribution but requires attribution, and the MIT licence above does not replace that requirement. If you reuse the data, carry the attribution statement below with it.
 

@@ -19,16 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
---------------------------------------------------------------------------
-
-NOTE ON THE GAME CONTENT
-
-The MIT licence above covers this project's own work: the HTML, CSS and
-JavaScript, the parser and build scripts, the tests, and the original
-plain-language explanations written for this project.
-
-The game data under data/ is from the System Reference Document 5.2.1, which
-Wizards of the Coast publishes under CC-BY-4.0. Redistributing it carries that
-licence's attribution requirement, which the MIT licence does not replace. The
-required attribution statement is in README.md and in the site footer.

@@ -1,0 +1,14 @@
+NOTE ON THE GAME CONTENT
+
+The MIT licence in LICENSE covers this project's own work: the HTML, CSS and
+JavaScript, the parser and build scripts, the tests, and the original
+plain-language explanations written for this project.
+
+The game data under data/ is from the System Reference Document 5.2.1, which
+Wizards of the Coast publishes under CC-BY-4.0. That licence permits
+redistribution but requires attribution, and the MIT licence does not replace
+that requirement. If you reuse the data, carry the attribution statement with
+it. The required wording is in README.md and in the site footer.
+
+No content from the Player's Handbook or any other non-open source is
+included.
