@@ -11,3 +11,6 @@ Thumbs.db
 
 # Local operational notes, not part of the published project.
 TAKEDOWN-RUNBOOK.md
+
+# Player's Handbook additions. Local only, not published.
+data/extras.json

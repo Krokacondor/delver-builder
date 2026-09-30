@@ -51,18 +51,18 @@ Everything the SRD covers is here:
 |---|---|
 | Classes (full level 1 data) | 12 |
 | Species | 9 |
-| Backgrounds | 4 (plus 12 from the Player's Handbook, see below) |
-| Origin / Fighting Style / General feats | 12 (plus 6 from the Player's Handbook) |
+| Backgrounds | 4, plus a custom-background builder |
+| Origin / Fighting Style / General feats | 12 |
 | Spells (all levels, fully parsed) | 339 |
 | Weapons with mastery properties | 38 |
 | Armor | 12 |
 
 **Not in the SRD:** Aasimar, 12 of the 16 Player's Handbook backgrounds, and three of the four subclasses per class. Subclasses do not matter here, because the 2024 rules start subclasses at level 3.
 
-Three things close that gap:
+This project ships **SRD content only**, so everything here is under a licence that permits redistribution. Two things cover the gap:
 
-- **`data/extras.json`** is loaded automatically when present and merges into the core data. It supplies the 12 remaining Player's Handbook backgrounds and the 6 Origin feats they grant (Crafter, Healer, Lucky, Musician, Tavern Brawler, Tough), so all 16 backgrounds are available. Every field was checked against the book: ability scores, Origin feat, skills, tool and both equipment options. Only the mechanics are reproduced, which are game rules rather than copyrightable expression; all descriptive prose in that file is original.
-- **Custom Background** is built into step 4. It uses the official custom-background rules from the SRD Gameplay Toolbox, so a player can invent whatever background they want.
+- **Custom Background** is built into step 4. It uses the official custom-background rules from the SRD Gameplay Toolbox: choose three ability scores, an Origin feat, two skills, a tool and a 50 GP kit. A player can build any background they want, including a close equivalent of a Player's Handbook one.
+- **`data/extras.json`** is loaded automatically if you create it, and merges into the core data. It is gitignored, so anything you put there stays on your machine and is never published. Copy `data/extras.example.json` to `data/extras.json` and fill in content from a book you own. Entries with a new id are added; entries reusing an existing id replace the core one.
 - **Your own additions.** Entries in `extras.json` with a new id are added; entries reusing an existing id replace the core one. `data/extras.example.json` shows the shape. To keep an addition off GitHub, put it in a separate file and add that filename to `.gitignore`.
 
 ## Next steps
@@ -123,13 +123,13 @@ The parser reads the per-class spell list tables to get canonical spell names, t
 
 ## Licensing
 
-This project has three layers, under different terms. They are kept separate on purpose, because only one of them is this project's to give away.
+Everything in this repository is under a licence that permits redistribution. There are two layers, and the distinction matters if you reuse the project.
 
-**The code** is licensed under the Apache License 2.0. See `LICENSE`. That covers the HTML, CSS and JavaScript, the parser and build scripts, the tests, and the original plain-language explanations written for this project. Reuse it freely.
+**The code** is licensed under the MIT Licence. See `LICENSE`. That covers the HTML, CSS and JavaScript, the parser and build scripts, the tests, and the original plain-language explanations written for this project. Reuse it freely.
 
-**The SRD game content** is from the System Reference Document 5.2.1, published by Wizards of the Coast under CC-BY-4.0, which permits redistribution with attribution. That is the classes, species, spells, equipment, feats, and the Acolyte, Criminal, Sage and Soldier backgrounds. The required attribution is below and in the site footer.
+**The game content** under `data/` is from the System Reference Document 5.2.1, published by Wizards of the Coast under CC-BY-4.0. That licence permits redistribution but requires attribution, and the MIT licence above does not replace that requirement. If you reuse the data, carry the attribution statement below with it.
 
-**The remaining 12 backgrounds and 6 Origin feats** in `data/extras.json` are from the 2024 Player's Handbook, which is not under an open license. Only their mechanics are reproduced: which ability scores, which feat, which two skills, which tool, which starting items. Game mechanics are not copyrightable, and no wording from the book appears anywhere in this repo. Every line of description in that file was written for this project. This layer is used, not licensed, and is not yours to redistribute on the strength of the Apache license above.
+No content from the Player's Handbook or any other non-open source is included.
 
 ## Attribution
 
