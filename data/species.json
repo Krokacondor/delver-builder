@@ -119,7 +119,7 @@
     {
       "id": "dragonborn",
       "name": "Dragonborn",
-      "tagline": "Breathe fire, acid or lightning. Very popular.",
+      "tagline": "Breathe fire, cold, lightning, acid or poison.",
       "plain": "You are descended from dragons and you get a breath weapon that hits everyone in a cone or line. Pick which dragon, and that decides your damage type and what you resist.",
       "beginnerFriendly": true,
       "complexity": "simple",
@@ -137,7 +137,7 @@
         {
           "id": "ancestry",
           "label": "Draconic Ancestry",
-          "help": "Mostly flavor. Fire is resisted by a lot of monsters; lightning and acid are resisted less often.",
+          "help": "This sets both your breath weapon damage and the damage you resist. Mostly flavor, but fire is resisted by a lot of monsters, while cold, lightning, acid and poison are resisted less often.",
           "grant": { "type": "option", "count": 1 },
           "options": [
             { "id": "black", "name": "Black Dragon", "text": "Acid damage", "effects": { "breathDamage": "Acid", "resistances": ["Acid"] } },

@@ -3,6 +3,7 @@
 
 import { DATA, spellsFor } from './data.js';
 import { el, pill, notice, counter, choiceCard, checkRow, difficultyDots, expandable } from './ui.js';
+import { glossify } from './glossary.js';
 import { ABILS, mod, fmt, derive, finalAbilities, backgroundBonuses, pointBuyCost, pointBuySpent, collectFeats, startingItems, speciesEffects } from './rules.js';
 
 export const STEPS = [
@@ -16,6 +17,19 @@ export const STEPS = [
 ];
 
 const asArray = v => (Array.isArray(v) ? v : v == null ? [] : [v]);
+
+/** Rules text with the plain-language version beneath it. Glossary terms in
+ *  the rules text define themselves on hover or tap. */
+function ruleAndPlain(ruleText, plainText) {
+  const wrap = el('div');
+  if (ruleText) {
+    const p = el('p', { class: 'ruletext' });
+    p.appendChild(glossify(ruleText));
+    wrap.appendChild(p);
+  }
+  if (plainText) wrap.appendChild(el('p', { class: 'plaintext', text: plainText }));
+  return wrap;
+}
 
 function head(title, lede) {
   return el('div', { class: 'step-head' }, el('h2', { text: title }), el('p', { class: 'lede', text: lede }));
@@ -98,7 +112,7 @@ function classDetail(c) {
   for (const feat of [...(c.features || []), ...(c.extraFeatures || [])]) {
     p.appendChild(el('div', { class: 'featureblock' },
       el('h4', { text: feat.name }),
-      el('p', { text: feat.plain })));
+      ruleAndPlain(feat.text, feat.plain)));
   }
   return p;
 }
@@ -131,13 +145,14 @@ export function renderSpecies(root, char, ctx) {
   if (!char.speciesId) return;
   const sp = DATA.byId.species[char.speciesId];
 
-  // Traits
+  // Traits: the real rules wording first, because that is what a player will
+  // hear at a table, with the plain-language version underneath.
   const tp = el('div', { class: 'panel' });
   tp.appendChild(el('h3', { text: `${sp.name} traits` }));
   for (const t of sp.traits) {
     tp.appendChild(el('div', { class: 'featureblock' },
       el('h4', { text: t.name }),
-      el('p', { text: t.plain })));
+      ruleAndPlain(t.text, t.plain)));
   }
   root.appendChild(tp);
 
@@ -263,9 +278,11 @@ export function renderAbilities(root, char, ctx) {
   const cls = char.classId ? DATA.byId.class[char.classId] : null;
   if (cls) {
     const order = cls.abilityPriority?.default || cls.abilityPriority?.[cls.primaryAbility[0]] || [];
+    // Each ability row is labelled with its priority, so this only needs to
+    // name the top three in full and explain why.
     root.appendChild(notice('tip', `Where to put your best scores as a ${cls.name}`,
       order.length
-        ? `${order.map(a => DATA.byId.ability[a].short).join(' → ')}. Highest score first. ${cls.primaryAbilityNote}`
+        ? `Highest score in ${DATA.byId.ability[order[0]].name}, next in ${DATA.byId.ability[order[1]].name}, then ${DATA.byId.ability[order[2]].name}. ${cls.primaryAbilityNote}`
         : cls.primaryAbilityNote));
   }
 
@@ -303,11 +320,37 @@ export function renderAbilities(root, char, ctx) {
     'You are not finished yet. In the next step your background adds +3 more points spread across three abilities, so a 15 here can become a 17.'));
 }
 
+/** Priority order for the chosen class, best ability first. */
+function abilityOrder(char) {
+  const cls = char.classId ? DATA.byId.class[char.classId] : null;
+  if (!cls) return [];
+  const ap = cls.abilityPriority || {};
+  return ap.default || ap[cls.primaryAbility[0]] || [];
+}
+
+/** How much this class cares about an ability, so the step can say so on the
+ *  row itself rather than only in a paragraph above. */
+function abilityAdvice(char, a) {
+  const order = abilityOrder(char);
+  const i = order.indexOf(a);
+  if (i < 0) return null;
+  if (i === 0) return { label: 'Most important', kind: 'good', rank: 1 };
+  if (i === 1) return { label: 'Second most important', kind: 'accent', rank: 2 };
+  if (i === 2) return { label: 'Third', kind: 'info', rank: 3 };
+  if (i >= order.length - 1) return { label: 'Safe to dump', kind: '', rank: i + 1 };
+  return null;
+}
+
 function abilityRow(char, a, opts) {
   const ab = DATA.byId.ability[a];
   const score = char.baseAbilities[a] || 0;
-  return el('div', { class: 'abilrow' },
-    el('div', { class: 'aname' }, ab.name, el('small', { text: ab.blurb })),
+  const advice = abilityAdvice(char, a);
+  const name = el('div', { class: 'aname' },
+    ab.name,
+    advice ? pill(advice.label, advice.kind) : null,
+    el('small', { text: ab.blurb }));
+  return el('div', { class: `abilrow${advice && advice.rank === 1 ? ' key' : ''}` },
+    name,
     opts.control,
     el('div', { class: 'score', text: score || '—' }),
     el('div', { class: 'modbox', text: score ? fmt(mod(score)) : '—' })
@@ -317,6 +360,26 @@ function abilityRow(char, a, opts) {
 function renderAssign(panel, char, ctx, values, assignKey, label) {
   panel.appendChild(el('h3', { text: `Assign the ${label}` }));
   panel.appendChild(el('p', { class: 'panel-note', text: 'Each number can be used once. Put your highest number in the ability your class cares about most.' }));
+
+  // One click does what the advice on each row describes: highest number into
+  // the ability the class needs most, and down from there.
+  const order = abilityOrder(char);
+  if (order.length === 6) {
+    const cls = DATA.byId.class[char.classId];
+    panel.appendChild(el('div', { class: 'row', style: 'margin-bottom:12px' },
+      el('button', {
+        type: 'button', class: 'btn primary', text: `Fill in the recommended ${cls.name} spread`,
+        onClick: () => {
+          const ranked = values.map((v, i) => ({ v, i })).sort((a, b) => b.v - a.v);
+          char[assignKey] = {};
+          order.forEach((abil, n) => { char[assignKey][abil] = ranked[n].i; });
+          for (const x of ABILS) char.baseAbilities[x] = values[char[assignKey][x]];
+          ctx.update();
+        }
+      }),
+      el('span', { class: 'muted', style: 'font-size:.82rem',
+        text: 'You can change any of it afterwards.' })));
+  }
 
   const chips = el('div', { class: 'rollgrid' });
   values.forEach((v, i) => {
@@ -486,7 +549,7 @@ export function renderBackground(root, char, ctx) {
     const feat = DATA.byId.feat[b.feat];
     p.appendChild(el('div', { class: 'featureblock' },
       el('h4', { text: `Origin feat: ${feat ? feat.name : b.feat}` }),
-      el('p', { text: feat ? feat.plain : '' })));
+      ruleAndPlain((feat?.benefits || []).map(x => x.text).join(' '), feat ? feat.plain : '')));
     p.appendChild(el('div', { class: 'featureblock' },
       el('h4', { text: 'Skill proficiencies' }),
       el('p', { text: b.skills.map(s => DATA.byId.skill[s].name).join(' and ') })));
@@ -592,40 +655,77 @@ function renderAbilityBoost(root, char, ctx) {
   }));
   p.appendChild(modes);
 
-  if (char.bgAbility.mode === '2-1') {
-    for (const [key, amount] of [['plus2', 2], ['plus1', 1]]) {
-      p.appendChild(el('h4', { text: `Which ability gets +${amount}?`, style: 'margin-top:14px' }));
-      const g = el('div', { class: 'cards' });
-      for (const a of abilities) {
-        const ab = DATA.byId.ability[a];
-        const otherKey = key === 'plus2' ? 'plus1' : 'plus2';
-        const taken = char.bgAbility[otherKey] === a;
-        const base = char.baseAbilities[a] || 0;
-        g.appendChild(choiceCard({
-          id: a, compact: true,
-          title: `${ab.name} ${base ? `${base} → ${Math.min(20, base + amount)}` : ''}`,
-          plain: taken ? 'Already used for the other bonus.' : ab.blurb,
-          selected: char.bgAbility[key] === a,
-          onPick: v => {
-            if (char.bgAbility[otherKey] === v) char.bgAbility[otherKey] = null;
-            char.bgAbility[key] = v; ctx.update();
+  // One row per eligible ability, each showing the score before and after and
+  // carrying its own buttons. Previously this was two separate card grids
+  // asking "which gets +2" then "which gets +1", which made it hard to see
+  // what the three abilities actually ended up as.
+  p.appendChild(el('h4', { text: `${bg.name} raises these three abilities`, style: 'margin-top:16px' }));
+
+  const rows = el('div', { class: 'boostlist' });
+  for (const a of abilities) {
+    const ab = DATA.byId.ability[a];
+    const base = char.baseAbilities[a] || 0;
+    const gain = char.bgAbility.mode === '1-1-1'
+      ? 1
+      : char.bgAbility.plus2 === a ? 2 : char.bgAbility.plus1 === a ? 1 : 0;
+    const after = Math.min(20, base + gain);
+
+    const controls = el('div', { class: 'boostbtns' });
+    if (char.bgAbility.mode === '2-1') {
+      for (const amount of [2, 1]) {
+        const key = amount === 2 ? 'plus2' : 'plus1';
+        const other = amount === 2 ? 'plus1' : 'plus2';
+        const on = char.bgAbility[key] === a;
+        controls.appendChild(el('button', {
+          type: 'button',
+          class: `btn small${on ? ' primary' : ''}`,
+          'aria-pressed': on ? 'true' : 'false',
+          text: `+${amount}`,
+          onClick: () => {
+            if (on) { char.bgAbility[key] = null; }
+            else {
+              if (char.bgAbility[other] === a) char.bgAbility[other] = null;
+              char.bgAbility[key] = a;
+            }
+            ctx.update();
           }
         }));
       }
-      p.appendChild(g);
+    } else {
+      controls.appendChild(pill('+1 automatically', 'good'));
     }
+
+    rows.appendChild(el('div', { class: `boostrow${gain ? ' on' : ''}` },
+      el('div', { class: 'bname' }, ab.name, el('small', { text: ab.blurb })),
+      controls,
+      el('div', { class: 'bmath' },
+        el('span', { class: 'was', text: base || '—' }),
+        el('span', { class: 'arrow', text: '→' }),
+        el('span', { class: 'now', text: after || '—' }),
+        el('small', { text: after ? `modifier ${fmt(mod(after))}` : '' }))
+    ));
+  }
+  p.appendChild(rows);
+
+  if (char.bgAbility.mode === '2-1') {
+    const need = [];
+    if (!char.bgAbility.plus2) need.push('+2');
+    if (!char.bgAbility.plus1) need.push('+1');
+    p.appendChild(need.length
+      ? notice('warn', `Still to place: ${need.join(' and ')}`, 'Tap the buttons above to put each bonus on an ability.')
+      : notice('tip', 'Both bonuses placed', 'Your final scores are below.'));
   }
 
-  // Live preview
+  // Final scores across all six, so the effect on the whole character is visible.
   const finals = finalAbilities(char);
   const bonus = backgroundBonuses(char);
-  const prev = el('div', { class: 'abilgrid', style: 'margin-top:16px' });
+  const prev = el('div', { class: 'abilgrid', style: 'margin-top:8px' });
   for (const a of ABILS) {
     const ab = DATA.byId.ability[a];
     prev.appendChild(el('div', { class: 'abilbox', style: bonus[a] ? 'border-color:var(--good)' : '' },
-      el('div', { class: 'k', text: ab.short }),
+      el('div', { class: 'k', text: ab.name }),
       el('div', { class: 'm', text: fmt(mod(finals[a])) }),
-      el('div', { class: 's', text: bonus[a] ? `${finals[a]} (+${bonus[a]})` : String(finals[a]) })));
+      el('div', { class: 's', text: bonus[a] ? `${finals[a]}  (+${bonus[a]})` : String(finals[a]) })));
   }
   p.appendChild(el('h4', { text: 'Your final ability scores', style: 'margin-top:16px' }));
   p.appendChild(prev);
@@ -1226,6 +1326,50 @@ function renderBonusSpells(bonus) {
   return p;
 }
 
+/** First sentence of a spell, which is almost always the "what it does" line.
+ *  Falls back to a trimmed opening when a spell leads with a long clause. */
+function spellSummary(desc) {
+  if (!desc) return '';
+  const first = desc.split(/(?<=\.)\s+(?=[A-Z])/)[0] || desc;
+  if (first.length <= 190) return first;
+  const cut = first.slice(0, 185);
+  return cut.slice(0, cut.lastIndexOf(' ')) + '…';
+}
+
+/** A short summary by default, with the full rules text one tap away.
+ *  Browsing 30 spells is impossible if each one is six lines of rules text. */
+function spellBody(s) {
+  const wrap = el('div');
+  const summary = spellSummary(s.description);
+  const hasMore = summary !== s.description || s.higherLevel;
+
+  wrap.appendChild(el('p', { class: 'spell-desc', text: summary }));
+  if (!hasMore) return wrap;
+
+  const full = el('div', { class: 'spell-full', hidden: true });
+  full.appendChild(el('p', { class: 'spell-desc' }, glossify(s.description)));
+  if (s.higherLevel) {
+    full.appendChild(el('p', { class: 'spell-desc', style: 'margin-top:5px' },
+      el('b', { text: 'Higher level: ' }), s.higherLevel));
+  }
+
+  const btn = el('button', {
+    type: 'button', class: 'spell-more', 'aria-expanded': 'false',
+    onClick: e => {
+      e.stopPropagation(); e.preventDefault();
+      const open = full.hidden;
+      full.hidden = !open;
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.replaceChildren(el('span', { class: 'chev', text: open ? '▲' : '▼' }),
+        open ? ' Hide full rules' : ' Full rules');
+    }
+  }, el('span', { class: 'chev', text: '▼' }), ' Full rules');
+
+  wrap.appendChild(btn);
+  wrap.appendChild(full);
+  return wrap;
+}
+
 /** Reusable spell chooser with search and filters. */
 function spellPicker({ title, note, list, level, need, selected, onToggle, recommended = [], onlyIds, known = new Map() }) {
   const p = el('div', { class: 'panel' });
@@ -1306,9 +1450,7 @@ function spellPicker({ title, note, list, level, need, selected, onToggle, recom
       if (s.ritual) meta.appendChild(pill('Ritual', 'info'));
       if (s.material) meta.appendChild(pill('Needs a material', 'warn'));
       card.appendChild(meta);
-      card.appendChild(expandable(s.description));
-      if (s.higherLevel) card.appendChild(el('p', { class: 'spell-desc', style: 'margin-top:4px',
-        text: `Higher level: ${s.higherLevel}` }));
+      card.appendChild(spellBody(s));
       results.appendChild(card);
     }
   }

@@ -416,7 +416,7 @@ label { font-size: .88rem; }
 .cs-id .v { font-weight: 700; font-size: .88rem; line-height: 1.2; }
 
 /* --- main three-column body --- */
-.cs-body { display: grid; gap: 10px; grid-template-columns: 196px minmax(0, 1fr); align-items: start; }
+.cs-body { display: grid; gap: 10px; grid-template-columns: 232px minmax(0, 1fr); align-items: start; }
 .cs-rail  { grid-column: 1; grid-row: 1 / span 2; }
 .cs-main  { grid-column: 2; grid-row: 1; }
 .cs-right { display: grid; gap: 10px; }
@@ -616,7 +616,7 @@ label { font-size: .88rem; }
   .cs-head { gap: 6px; margin-bottom: 6px; }
   .cs-name input { font-size: 1.25rem; }
   .cs-id { padding: 3px 6px; }
-  .cs-body { gap: 6px; grid-template-columns: 180px minmax(0, 1fr); }
+  .cs-body { gap: 6px; grid-template-columns: 212px minmax(0, 1fr); }
   .cs-right { gap: 6px; }
   .cs-abils { gap: 4px; }
   .cs-abil { padding: 2px 4px 7px; }
@@ -687,6 +687,91 @@ label { font-size: .88rem; }
   .brand-sub { display: none; }
   .step-head h2 { font-size: 1.35rem; }
 }
+
+/* ---------- glossary chips ----------
+   A rules term that defines itself in place. Hover on a desktop, tap on a
+   phone, focus with a keyboard. */
+.gloss {
+  font: inherit; color: inherit; background: none; padding: 0; margin: 0;
+  border: 0; border-bottom: 1px dotted var(--accent);
+  cursor: help; position: relative; text-align: left;
+}
+.gloss:hover, .gloss:focus-visible, .gloss.open { color: var(--accent); }
+
+.gloss-pop {
+  position: absolute; bottom: calc(100% + 7px); left: 0;
+  width: max-content; max-width: min(300px, 78vw);
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 9px 11px; font-size: .8rem; font-weight: 400; line-height: 1.45;
+  box-shadow: 0 4px 16px rgba(0,0,0,.18);
+  opacity: 0; visibility: hidden; transform: translateY(3px);
+  transition: opacity .12s, transform .12s, visibility .12s;
+  z-index: 40; white-space: normal; cursor: auto;
+}
+.gloss-pop b { display: block; margin-bottom: 2px; color: var(--accent); }
+.gloss:hover .gloss-pop,
+.gloss:focus-visible .gloss-pop,
+.gloss.open .gloss-pop { opacity: 1; visibility: visible; transform: translateY(0); }
+
+/* Near the right edge the bubble would overflow, so anchor it to the right. */
+.gloss.flip-right .gloss-pop { left: auto; right: 0; }
+
+/* Rules text and its plain-language companion. */
+.ruletext { margin: 0 0 3px; font-size: .88rem; }
+.plaintext { margin: 0; font-size: .84rem; color: var(--text-dim); }
+.plaintext::before {
+  content: "In plain terms: "; font-weight: 600; color: var(--accent);
+}
+
+@media print {
+  .gloss { border-bottom: 0; color: inherit !important; }
+  .gloss-pop { display: none !important; }
+}
+
+/* Ability rows carry their own recommendation, so the advice sits beside the
+   control it applies to rather than only in a paragraph above. */
+.abilrow .aname .pill { margin-left: 7px; vertical-align: middle; }
+.abilrow.key { background: color-mix(in srgb, var(--good) 6%, transparent); border-radius: 8px; }
+.abilrow.key .aname { font-weight: 700; }
+
+/* ---------- background ability boost ----------
+   One row per eligible ability: name, the buttons that place the bonus, and
+   the before/after score, so the whole decision is visible at once. */
+.boostlist { display: grid; gap: 8px; margin-bottom: 14px; }
+.boostrow {
+  display: grid; align-items: center; gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto minmax(118px, auto);
+  padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px;
+  background: var(--surface);
+}
+.boostrow.on { border-color: var(--good); background: color-mix(in srgb, var(--good) 6%, var(--surface)); }
+.boostrow .bname { font-weight: 600; }
+.boostrow .bname small { display: block; font-weight: 400; font-size: .78rem; color: var(--text-dim); line-height: 1.35; }
+.boostbtns { display: flex; gap: 6px; }
+.boostbtns .btn { min-width: 46px; }
+.bmath { text-align: right; font-variant-numeric: tabular-nums; }
+.bmath .was { font-size: 1.05rem; color: var(--text-dim); }
+.bmath .arrow { margin: 0 5px; color: var(--text-dim); }
+.bmath .now { font-family: var(--font-head); font-size: 1.45rem; font-weight: 700; }
+.bmath small { display: block; font-size: .72rem; color: var(--text-dim); }
+
+@media (max-width: 560px) {
+  .boostrow { grid-template-columns: 1fr auto; row-gap: 8px; }
+  .boostrow .bname { grid-column: 1 / -1; }
+  .bmath { text-align: left; }
+}
+
+/* Spell cards show a one-line summary; the full rules are one tap away. */
+.spell-more {
+  display: inline-flex; align-items: center; gap: 5px;
+  font: inherit; font-size: .76rem; font-weight: 600;
+  color: var(--accent); background: none; border: 0;
+  padding: 5px 0 2px; cursor: pointer;
+}
+.spell-more .chev { font-size: .6rem; }
+.spell-more:hover { text-decoration: underline; }
+.spell-full { margin-top: 3px; padding-top: 6px; border-top: 1px dashed var(--border); }
 </style>
 
 <a class="skip" href="#main">Skip to content</a>

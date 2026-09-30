@@ -8,6 +8,7 @@
 
 import { DATA, spellsFor } from './data.js';
 import { el, notice } from './ui.js';
+import { glossify } from './glossary.js';
 import { ABILS, fmt, derive, stepIssues } from './rules.js';
 import { STEPS } from './steps.js';
 
@@ -141,7 +142,7 @@ export function renderSheet(root, char, ctx) {
     skillList.appendChild(el('li', { title: s.sources.length ? `From ${s.sources.join(', ')}` : '' },
       el('span', { class: cls, 'aria-hidden': 'true' }),
       el('span', { class: 'nm', text: s.name }),
-      el('span', { class: 'ab', text: DATA.byId.ability[s.ability].short }),
+      el('span', { class: 'ab', text: DATA.byId.ability[s.ability].name }),
       el('span', { class: 'mod', text: fmt(s.mod) })));
   }
   skillSec.appendChild(skillList);
@@ -159,7 +160,7 @@ export function renderSheet(root, char, ctx) {
     stat('Armor Class', String(d.ac), null, 'cs-shield'),
     stat('Initiative', fmt(d.initiative)),
     stat('Speed', `${d.speed}`, 'feet'),
-    stat('Proficiency', fmt(d.pb)),
+    stat('Proficiency Bonus', fmt(d.pb)),
     stat('Passive Perception', String(d.passivePerception)),
     // Size already sits in the masthead, so non-casters simply get one box
     // fewer here rather than a duplicate.
@@ -201,10 +202,10 @@ export function renderSheet(root, char, ctx) {
     el('div', { class: 'bx' },
       el('div', { class: 'hpmain' }, curInput, el('span', { class: 'max', text: `/ ${hpMax}` })),
       el('div', { class: 'bx-t', text: 'Hit Points' }),
-      el('div', { class: 'bx-t', style: 'font-size:.56rem;opacity:.8', text: `max ${hpMax}` })),
+      el('div', { class: 'bx-t', style: 'font-size:.56rem;opacity:.8', text: `maximum ${hpMax}` })),
     el('div', { class: 'bx' },
       tempInput,
-      el('div', { class: 'bx-t', text: 'Temp HP' })),
+      el('div', { class: 'bx-t', text: 'Temporary Hit Points' })),
     el('div', { class: 'bx' },
       el('div', { class: 'bx-v', style: 'font-size:1.25rem', text: d.hitDie }),
       el('div', { class: 'bx-t', text: 'Hit Dice' }),
@@ -310,17 +311,17 @@ export function renderSheet(root, char, ctx) {
     }
     featWrap.appendChild(el('div', { class: 'cs-feat' },
       el('h4', {}, f.name + extra, el('span', { class: 'from', text: ` · ${d.cls.name}` })),
-      el('p', { text: f.plain })));
+      sheetRule(f.text, f.plain)));
   }
   for (const t of d.sp.traits) {
     featWrap.appendChild(el('div', { class: 'cs-feat' },
       el('h4', {}, t.name, el('span', { class: 'from', text: ` · ${d.sp.name}` })),
-      el('p', { text: t.plain })));
+      sheetRule(t.text, t.plain)));
   }
   for (const { feat, source } of d.feats) {
     featWrap.appendChild(el('div', { class: 'cs-feat' },
       el('h4', {}, feat.name, el('span', { class: 'from', text: ` · feat from ${source}` })),
-      el('p', { text: feat.plain })));
+      sheetRule((feat.benefits || []).map(x => x.text).join(' '), feat.plain)));
   }
   featSec.appendChild(featWrap);
 
@@ -337,7 +338,7 @@ export function renderSheet(root, char, ctx) {
     for (const m of d.masteries) {
       masterySec.appendChild(el('div', { class: 'cs-feat' },
         el('h4', { text: `${m.weapon}: ${m.mastery.name}` }),
-        el('p', { text: m.mastery.plain })));
+        sheetRule(m.mastery.text, m.mastery.plain)));
     }
   }
 
@@ -519,6 +520,19 @@ function spellEntry(s, note) {
     s.higherLevel ? el('p', { class: 'up', text: `Higher level: ${s.higherLevel}` }) : null);
 }
 
+/** Rules wording with the plain-language line beneath it, for the sheet.
+ *  Glossary terms in the rules text define themselves on hover or tap. */
+function sheetRule(ruleText, plainText) {
+  const wrap = el('div');
+  if (ruleText) {
+    const p = el('p', { class: 'ruletext' });
+    p.appendChild(glossify(ruleText));
+    wrap.appendChild(p);
+  }
+  if (plainText) wrap.appendChild(el('p', { class: 'plaintext', text: plainText }));
+  return wrap;
+}
+
 function firstTurnAdvice(d) {
   const bits = [];
   if (d.attacks.length) {
@@ -546,7 +560,7 @@ function sheetText(char, d) {
   L.push(`Size ${d.size}${d.darkvision ? `  |  Darkvision ${d.darkvision} ft` : ''}${d.resistances.length ? `  |  Resist ${d.resistances.join(', ')}` : ''}`);
   L.push('');
   L.push('ABILITY SCORES');
-  L.push(ABILS.map(a => `${DATA.byId.ability[a].short} ${d.abilities[a]} (${fmt(d.mods[a])})`).join('   '));
+  for (const a of ABILS) L.push(`  ${DATA.byId.ability[a].name.padEnd(14)} ${String(d.abilities[a]).padStart(2)}  (${fmt(d.mods[a])})`);
   L.push('');
   L.push('SAVING THROWS');
   L.push(d.saves.map(s => `${s.proficient ? '*' : ' '}${s.name} ${fmt(s.mod)}`).join('   '));

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>mobile frame</title>
+<style>
+  html,body{margin:0;background:#555;font:12px monospace}
+  iframe{display:block;border:0;background:#fff}
+  #report{position:fixed;right:0;top:0;width:calc(100% - 400px);height:100%;
+          overflow:auto;color:#fff;padding:10px;white-space:pre-wrap}
+</style></head>
+<body>
+<!-- An iframe gets its own layout viewport, so the inner page really is 390px
+     wide and its media queries fire as they would on a phone. Headless Edge
+     clamps its own window to about 477px, which makes --window-size useless
+     for this. -->
+<iframe id="ph" src="../index.html#class" width="390" height="900"></iframe>
+<pre id="report">waiting…</pre>
+<script>
+const params = new URLSearchParams(location.search);
+const step = params.get('step') || 'class';
+const ph = document.getElementById('ph');
+ph.src = '../index.html#' + step;
+
+ph.addEventListener('load', () => setTimeout(() => {
+  const d = ph.contentDocument, w = ph.contentWindow;
+  const vw = d.documentElement.clientWidth;
+  const bad = [];
+  d.querySelectorAll('*').forEach(e => {
+    const r = e.getBoundingClientRect();
+    // Skip anything inside a deliberately scrollable strip.
+    if (e.closest('.stepper ol, [style*="overflow-x"], .cs-tbl')) return;
+    if (r.width > vw + 1 || r.right > vw + 1) {
+      const cls = (e.className && typeof e.className === 'string')
+        ? '.' + e.className.trim().split(/\s+/).slice(0, 2).join('.') : '';
+      bad.push(e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + cls
+        + '  w=' + Math.round(r.width) + ' right=' + Math.round(r.right));
+    }
+  });
+  const lines = [...new Set(bad)].slice(0, 25);
+  document.getElementById('report').textContent =
+    'step: ' + step + '\ninner viewport: ' + vw + 'px'
+    + '\ninner scrollWidth: ' + d.documentElement.scrollWidth + 'px'
+    + '\nhorizontal scroll: ' + (d.documentElement.scrollWidth > vw + 1 ? 'YES' : 'no')
+    + '\n\n' + (lines.length ? lines.join('\n') : 'nothing overflows');
+  document.title = 'done';
+}, 2600));
+</script>
+</body></html>
