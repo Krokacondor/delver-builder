@@ -309,6 +309,16 @@ label { font-size: .88rem; }
 .spell-head .sname { font-weight: 700; font-size: .98rem; }
 .spell-head .sschool { font-size: .78rem; color: var(--text-dim); font-style: italic; }
 .spell-meta { display: flex; flex-wrap: wrap; gap: 5px; margin: 5px 0; }
+/* Most pills are two or three words, so the global nowrap keeps "1 round" from
+   breaking mid-phrase. A few spell fields are much longer, and those have to
+   wrap rather than run off the card. Squarer corners so a wrapped one reads as
+   a box instead of a stretched lozenge. */
+.spell-meta .pill {
+  white-space: normal; text-align: left;
+  max-width: 100%; min-width: 0; border-radius: 10px;
+}
+.spell-trigger { font-size: .82rem; color: var(--text-dim); margin: 2px 0 0; }
+.spell-trigger b { color: var(--text); }
 .spell-desc { font-size: .85rem; color: var(--text-dim); margin: 4px 0 0; }
 /* Only applied when the reader collapses an unusually long spell themselves. */
 .spell-desc.clamped { display: -webkit-box; -webkit-line-clamp: 8; -webkit-box-orient: vertical; overflow: hidden; }

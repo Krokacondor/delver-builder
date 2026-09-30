@@ -1336,6 +1336,18 @@ function spellSummary(desc) {
   return cut.slice(0, cut.lastIndexOf(' ')) + '…';
 }
 
+/* A few casting times are a whole sentence: "Reaction, which you take when you
+   are hit by an attack roll...". Squeezed into a pill that is an unreadable
+   lozenge, so the action itself stays a pill and the condition becomes a
+   Trigger line under it. That is also the order a player needs to read it in:
+   what the spell costs, then when you are allowed to spend it. */
+export function splitCastingTime(ct) {
+  const m = /^(.+?),\s*which you take\s+(.+)$/i.exec(ct || '');
+  if (!m) return [ct, null];
+  const trigger = m[2].trim();
+  return [m[1].trim(), trigger.charAt(0).toUpperCase() + trigger.slice(1)];
+}
+
 /** A short summary by default, with the full rules text one tap away.
  *  Browsing 30 spells is impossible if each one is six lines of rules text. */
 function spellBody(s) {
@@ -1444,12 +1456,17 @@ function spellPicker({ title, note, list, level, need, selected, onToggle, recom
         !alreadyFrom && recommended.includes(s.id) ? pill('Recommended', 'good') : null,
         on ? pill('✓ chosen', 'accent') : null));
 
+      const [castAction, castTrigger] = splitCastingTime(s.castingTime);
       const meta = el('div', { class: 'spell-meta' },
-        pill(s.castingTime), pill(s.range), pill(s.duration));
+        pill(castAction), pill(s.range), pill(s.duration));
       if (s.concentration) meta.appendChild(pill('Concentration', 'warn'));
       if (s.ritual) meta.appendChild(pill('Ritual', 'info'));
       if (s.material) meta.appendChild(pill('Needs a material', 'warn'));
       card.appendChild(meta);
+      if (castTrigger) {
+        card.appendChild(el('p', { class: 'spell-trigger' },
+          el('b', { text: 'Trigger: ' }), glossify(castTrigger)));
+      }
       card.appendChild(spellBody(s));
       results.appendChild(card);
     }

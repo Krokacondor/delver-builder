@@ -273,6 +273,29 @@ async function run() {
     }
   }
 
+  /* Casting times like Shield's are a full sentence. The action belongs in the
+     pill; the condition belongs on its own line, or the pill runs off the card. */
+  {
+    const c = buildFor('wizard');
+    c.spells.cantrips = []; c.spells.prepared = [];
+    const box = renderInto('spells', c);
+    const pills = [...box.querySelectorAll('.spell-meta .pill')].map(p => p.textContent);
+    const longest = pills.reduce((a, b) => (b.length > a.length ? b : a), '');
+    ok('no spell pill holds a whole sentence', longest.length <= 45, `longest="${longest}"`);
+
+    const shield = [...box.querySelectorAll('.spell')]
+      .find(s => s.querySelector('.sname')?.textContent === 'Shield');
+    ok('Shield is listed for a wizard', !!shield);
+    if (shield) {
+      ok('Shield casting time is just the action',
+         [...shield.querySelectorAll('.spell-meta .pill')][0].textContent === 'Reaction');
+      ok('Shield shows its trigger on its own line',
+         /^Trigger:\s*When you are hit by an attack roll/
+           .test(shield.querySelector('.spell-trigger')?.textContent || ''),
+         shield.querySelector('.spell-trigger')?.textContent);
+    }
+  }
+
   await new Promise(r => setTimeout(r, 120));
   ok('no uncaught errors', errors.length === 0, errors.join(' | '));
 
