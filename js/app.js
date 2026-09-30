@@ -148,17 +148,22 @@ function update(opts = {}) {
   paintSummary();
   if (opts.scroll) scrollToTop();
   if (opts.keepFocus) {
-    // Re-rendering blows away focus; restore it for text inputs being typed in.
-    const sel = opts.keepFocus;
-    const match = root.querySelector(`input[type="${sel.type}"][value="${sel.value}"]`);
-    if (match) { match.focus(); match.select?.(); }
+    /* Re-rendering blows away focus. Restore it by a stable key the renderer
+       put on the control, never by its value: two abilities sitting at the
+       same score would otherwise hand focus to whichever came first in the
+       document, so the caret hopped between rows as you typed. */
+    const match = root.querySelector(`[data-fkey="${CSS.escape(opts.keepFocus)}"]`);
+    if (match) match.focus();
   }
 }
 
 const ctx = {
   update,
   goto,
-  silentSave: () => { save(char); paintSummary(); }
+  silentSave: () => { save(char); paintSummary(); },
+  /* Save and repaint everything around the step without rebuilding the step
+     itself, so a control the user is actively working in survives. */
+  refresh: () => { save(char); paintStepper(); paintNav(); paintSummary(); }
 };
 
 /* ---------------- reference modal ---------------- */

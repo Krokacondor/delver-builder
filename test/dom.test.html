@@ -3,11 +3,14 @@
 <head><meta charset="utf-8"><title>DOM smoke test</title></head>
 <body>
 <pre id="out">running…</pre>
-<div id="sandbox" style="display:none"></div>
+<!-- Off-screen rather than display:none: a hidden element cannot take focus,
+     and some assertions here are about focus surviving a change. -->
+<div id="sandbox" style="position:absolute;left:-10000px;top:0;width:900px"></div>
 
 <script type="module">
 import { loadData, DATA } from '../js/data.js';
-import { newCharacter, derive, stepIssues } from '../js/rules.js';
+import { newCharacter, derive, stepIssues, ABILS } from '../js/rules.js';
+import { dealsDamage, healsHitPoints } from '../js/spelltags.js';
 import { STEPS, renderClass, renderSpecies, renderAbilities, renderBackground, renderProficiencies, renderSpells } from '../js/steps.js';
 import { renderSheet } from '../js/sheet.js';
 
@@ -29,7 +32,7 @@ const errors = [];
 window.addEventListener('error', e => errors.push(e.message));
 window.addEventListener('unhandledrejection', e => errors.push(String(e.reason)));
 
-const ctx = { update: () => {}, goto: () => {}, silentSave: () => {} };
+const ctx = { update: () => {}, goto: () => {}, silentSave: () => {}, refresh: () => {} };
 
 function renderInto(stepId, char) {
   const box = document.createElement('div');
@@ -294,6 +297,69 @@ async function run() {
            .test(shield.querySelector('.spell-trigger')?.textContent || ''),
          shield.querySelector('.spell-trigger')?.textContent);
     }
+  }
+
+  /* Manual entry must not rebuild the step, or the field being typed in is
+     destroyed mid-keystroke and focus lands on whichever row matched next. */
+  {
+    const c = newCharacter();
+    c.classId = 'fighter';
+    c.abilityMethod = 'manual';
+    for (const a of ABILS) c.baseAbilities[a] = 12;   // all equal: the old bug
+    const box = renderInto('abilities', c);
+    const inputs = [...box.querySelectorAll('input[type="number"][data-fkey]')];
+    ok('manual entry gives every ability a distinct focus key',
+       new Set(inputs.map(i => i.dataset.fkey)).size === 6, `found ${inputs.length}`);
+
+    const dex = box.querySelector('[data-fkey="manual-dex"]');
+    ok('manual dex field exists', !!dex);
+    if (dex) {
+      dex.focus();
+      dex.value = '17';
+      dex.dispatchEvent(new Event('input', { bubbles: true }));
+      ok('typing updates the model', c.baseAbilities.dex === 17, String(c.baseAbilities.dex));
+      ok('typing does not steal focus from the field', document.activeElement === dex,
+         document.activeElement?.dataset?.fkey || document.activeElement?.tagName);
+      const row = dex.closest('.abilrow');
+      ok('the row repaints its score in place', row.querySelector('.score').textContent === '17');
+      ok('the row repaints its modifier in place', row.querySelector('.modbox').textContent === '+3',
+         row.querySelector('.modbox').textContent);
+      ok('other abilities are untouched', c.baseAbilities.str === 12 && c.baseAbilities.con === 12);
+
+      dex.value = '99';
+      dex.dispatchEvent(new Event('change', { bubbles: true }));
+      ok('committing clamps an out-of-range score', c.baseAbilities.dex === 20 && dex.value === '20',
+         `${c.baseAbilities.dex} / ${dex.value}`);
+    }
+  }
+
+  /* Point Buy does re-render, so its buttons need keys to be refocusable. */
+  {
+    const c = newCharacter();
+    c.classId = 'wizard'; c.abilityMethod = 'pointbuy';
+    for (const a of ABILS) c.baseAbilities[a] = 8;
+    const keys = [...renderInto('abilities', c).querySelectorAll('.stepbtns [data-fkey]')]
+      .map(b => b.dataset.fkey);
+    ok('point buy buttons all have distinct focus keys',
+       keys.length === 12 && new Set(keys).size === 12, keys.length + ' buttons');
+  }
+
+  /* The damage and healing filters read what a spell does, not whether the
+     word appears in it. Mending mentions "the former damage"; Resistance
+     reduces damage; neither deals any. */
+  {
+    const by = DATA.spellsByName;
+    const dmgIn = ['Fire Bolt', 'Magic Missile', 'Burning Hands', 'Acid Splash', 'Ray of Frost',
+                   'Chromatic Orb', 'Sorcerous Burst', 'Thunderwave', 'Guiding Bolt', 'Inflict Wounds'];
+    const dmgOut = ['Mending', 'Resistance', 'Prestidigitation', 'Cure Wounds', 'Shield',
+                    'Feather Fall', 'Light', 'Mage Hand', 'Guidance', 'Sleep', 'Magic Weapon'];
+    for (const n of dmgIn) ok(`"${n}" counts as a damage spell`, !!by[n] && dealsDamage(by[n]));
+    for (const n of dmgOut) ok(`"${n}" is not a damage spell`, !!by[n] && !dealsDamage(by[n]));
+
+    const healIn = ['Cure Wounds', 'Healing Word', 'Mass Cure Wounds', 'Heal', 'Aid'];
+    const healOut = ['Fireball', 'Mending', 'Resistance', 'Inflict Wounds', 'False Life', 'Magic Missile'];
+    for (const n of healIn) ok(`"${n}" counts as healing`, !!by[n] && healsHitPoints(by[n]));
+    for (const n of healOut) ok(`"${n}" is not healing`, !!by[n] && !healsHitPoints(by[n]));
   }
 
   await new Promise(r => setTimeout(r, 120));

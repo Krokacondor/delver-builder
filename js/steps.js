@@ -4,6 +4,7 @@
 import { DATA, spellsFor } from './data.js';
 import { el, pill, notice, counter, choiceCard, checkRow, difficultyDots, expandable } from './ui.js';
 import { glossify } from './glossary.js';
+import { dealsDamage, healsHitPoints } from './spelltags.js';
 import { ABILS, mod, fmt, derive, finalAbilities, backgroundBonuses, pointBuyCost, pointBuySpent, collectFeats, startingItems, speciesEffects } from './rules.js';
 
 export const STEPS = [
@@ -436,11 +437,16 @@ function renderPointBuy(panel, char, ctx) {
     const nextCost = pointBuyCost(score + 1);
     const canUp = score < DATA.rules.pointBuy.max && nextCost != null && (spent - pointBuyCost(score) + nextCost) <= budget;
     const canDown = score > DATA.rules.pointBuy.min;
+    // Point Buy does need a full re-render, because one change moves the
+    // budget and can disable buttons on every other row. Focus is restored by
+    // key so holding Enter on + keeps raising the same ability.
     const ctrl = el('div', { class: 'stepbtns' },
-      el('button', { type: 'button', class: 'btn small', disabled: !canDown, 'aria-label': `Lower ${a}`, text: '−',
-        onClick: () => { char.baseAbilities[a]--; ctx.update(); } }),
-      el('button', { type: 'button', class: 'btn small', disabled: !canUp, 'aria-label': `Raise ${a}`, text: '+',
-        onClick: () => { char.baseAbilities[a]++; ctx.update(); } })
+      el('button', { type: 'button', class: 'btn small', disabled: !canDown, 'aria-label': `Lower ${DATA.byId.ability[a].name}`, text: '−',
+        'data-fkey': `pb-down-${a}`,
+        onClick: () => { char.baseAbilities[a]--; ctx.update({ keepFocus: `pb-down-${a}` }); } }),
+      el('button', { type: 'button', class: 'btn small', disabled: !canUp, 'aria-label': `Raise ${DATA.byId.ability[a].name}`, text: '+',
+        'data-fkey': `pb-up-${a}`,
+        onClick: () => { char.baseAbilities[a]++; ctx.update({ keepFocus: `pb-up-${a}` }); } })
     );
     panel.appendChild(abilityRow(char, a, { control: ctrl }));
   }
@@ -480,13 +486,34 @@ function renderManual(panel, char, ctx) {
   for (const a of ABILS) {
     const input = el('input', {
       type: 'number', min: '1', max: '20', value: String(char.baseAbilities[a] || 10),
-      style: 'width:88px',
+      style: 'width:88px', 'data-fkey': `manual-${a}`,
+      /* No full re-render here. Rebuilding the step under a field being typed
+         in destroys the input, which loses the caret and makes the spinner
+         arrows useless: each click would replace the control mid-press. Only
+         the two numbers that depend on this score are repainted. */
       onInput: e => {
-        const v = Math.max(1, Math.min(20, Number(e.target.value) || 0));
-        char.baseAbilities[a] = v; ctx.update({ keepFocus: e.target });
+        const raw = e.target.value;
+        char.baseAbilities[a] = raw === '' ? 0 : Math.max(1, Math.min(20, Number(raw) || 0));
+        paintRow();
+        if (ctx.refresh) ctx.refresh(); else ctx.silentSave?.();
+      },
+      // Clamping is deferred to commit so that typing "1" on the way to "15"
+      // does not fight the user, but an out-of-range value never sticks.
+      onChange: e => {
+        const v = Math.max(1, Math.min(20, Number(e.target.value) || 10));
+        char.baseAbilities[a] = v;
+        e.target.value = String(v);
+        paintRow();
+        if (ctx.refresh) ctx.refresh(); else ctx.silentSave?.();
       }
     });
-    panel.appendChild(abilityRow(char, a, { control: input }));
+    const row = abilityRow(char, a, { control: input });
+    const paintRow = () => {
+      const score = char.baseAbilities[a] || 0;
+      row.querySelector('.score').textContent = score || '—';
+      row.querySelector('.modbox').textContent = score ? fmt(mod(score)) : '—';
+    };
+    panel.appendChild(row);
   }
 }
 
@@ -1416,8 +1443,8 @@ function spellPicker({ title, note, list, level, need, selected, onToggle, recom
     switch (state.filter) {
       case 'selected': return selected.includes(s.id);
       case 'recommended': return recommended.includes(s.id);
-      case 'damage': return /\bdamage\b/i.test(s.description);
-      case 'healing': return /regain|Hit Points|heal/i.test(s.description);
+      case 'damage': return dealsDamage(s);
+      case 'healing': return healsHitPoints(s);
       case 'concentration': return !s.concentration;
       case 'ritual': return s.ritual;
       default: return true;
